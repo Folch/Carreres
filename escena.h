@@ -19,26 +19,25 @@
 
 using namespace std;
 
-class escena
-{
-public:
-    escena();
-    ~escena();
+class escena {
+    public:
+        escena();
+        ~escena();
 
-    void addObjecte(Objecte *cotxe);
-    void aplicaTG(mat4 m);
+        void addObjecte(Objecte *obj);
+        void aplicaTG(mat4 m);
 
-    void aplicaTGCentrat(mat4 m);
-    void reset();
+        void aplicaTGCentrat(mat4 m);
+        void reset();
 
-    void draw();
-    void CapsaMinCont3DEscena();
+        void draw();
+        void CapsaMinCont3DEscena();
 
-    // Capsa contenedora de l'escena
-    Capsa3D capsaMinima;
-
-    // Objectes de l'escena: a modificar. Ara nomes té un objecte. Cal afegir un conjunt d'objectes
-    Cotxe *cotxe;
+        // Capsa contenedora de l'escena
+        Capsa3D capsaMinima;
+    private:
+        // Objectes de l'escena: a modificar. Ara nomes té un objecte. Cal afegir un conjunt d'objectes
+        vector<Objecte*> vObjectes;
 
 };
 
