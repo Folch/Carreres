@@ -143,8 +143,7 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
     // Cal modificar-lo per a que es posicioni a la Y correcte
     float yorig = 0;
 
-    //obj = new Cotxe(fichero, mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
-    obj = new Cotxe(fichero);
+    obj = new Cotxe(fichero, mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
     newObjecte(obj);
 }
 
@@ -187,8 +186,11 @@ void GLWidget::paintGL()
                         RotateY( yRot / 16.0 ) *
                         RotateZ( zRot / 16.0 ) );
 
-    esc->aplicaTGCentrat(transform);
-    esc->draw();
+
+    if (esc->cotxe!=NULL) {
+        esc->cotxe->aplicaTGCentrat(transform);
+        esc->draw();
+    }
 }
 
 void GLWidget::resizeGL(int width, int height)

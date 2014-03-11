@@ -43,8 +43,6 @@ protected:
     color4 *colors;
     int Index; // index de control del numero de vertexs a posar a la GPU
 
-    void construeix_cara ( char **words, int nwords);
-
 
 public:
 
@@ -61,19 +59,19 @@ public:
     ~Objecte();
 
     // llegeix un model en format OBJ
-    virtual void readObj(QString filename) = 0;
+    virtual void readObj(QString filename);
 
     // make(): omple l'estructura de points i colors de l'objecte, inicialitza NumVertices
     // Si l'objecte es construeix procedimentalment es sobrecarrega el make
-    virtual void make() = 0;
+    virtual void make();
 
     // Pas generic de vertexs i colors a la GPU
     void toGPU(QGLShaderProgram *p);
     // Pintat amb la GPU
-    virtual void draw() = 0;
+    virtual void draw();
 
     // Calcula la capsa 3D contenidora de l'objecte
-    virtual Capsa3D calculCapsa3D() = 0;
+    Capsa3D calculCapsa3D();
 
     // Aplica una TG qualsevol a un objecte
     void aplicaTG(mat4 m);
@@ -81,6 +79,8 @@ public:
     // Aplica una TG centrada en el punt central de la capsa de l'objecte a un objecte
     void aplicaTGCentrat(mat4 m);
 
+private:
+    void construeix_cara ( char **words, int nwords);
 
 };
 
