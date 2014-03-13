@@ -1,7 +1,7 @@
 #ifndef TERRA_H
 #define TERRA_H
 
-class Terra
+class Terra : public Objecte
 {
 public:
     Terra();
