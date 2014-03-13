@@ -16,6 +16,7 @@
 
 #include <objecte.h>
 #include <cotxe.h>
+#include <terra.h>
 
 using namespace std;
 
@@ -25,7 +26,8 @@ public:
     escena();
     ~escena();
 
-    void addObjecte(Objecte *cotxe);
+    void addObjecte(Objecte *obj);
+    void addLand(Terra *t);
     void aplicaTG(mat4 m);
 
     void aplicaTGCentrat(mat4 m);
@@ -38,7 +40,8 @@ public:
     Capsa3D capsaMinima;
 
     // Objectes de l'escena: a modificar. Ara nomes té un objecte. Cal afegir un conjunt d'objectes
-    Cotxe *cotxe;
+    vector<Objecte*> vObjectes;
+    Terra *terra;
 
 };
 

@@ -1,7 +1,6 @@
 #include "cotxe.h"
 
-Cotxe::Cotxe(QString n) : Objecte(NumVerticesF)
-{
+Cotxe::Cotxe(QString n) : Objecte(NumVerticesF) {
     nom = n;
     Index = 0;
     tam = 1;

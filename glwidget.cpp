@@ -113,8 +113,11 @@ void GLWidget::newObjecte(Objecte * obj)
 {
     adaptaObjecteTamanyWidget(obj);
     obj->toGPU(program);
-    esc->addObjecte(obj);
-
+    if(dynamic_cast<Terra*>(obj)) {
+        esc->addLand((Terra*)obj);
+    }else{
+        esc->addObjecte(obj);
+    }
     updateGL();
 }
 
@@ -133,6 +136,10 @@ void GLWidget::newTerra(float amplaria, float profunditat, float y)
     // (quadrat d'una certa mida amb origen a xorig, yorig, zorig
 
     // Metode a implementar
+    Terra *t;
+
+    t = new Terra(amplaria, profunditat, y);
+    newObjecte(t);
 
  }
 
@@ -150,7 +157,7 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
 void GLWidget::initializeGL()
 {
     glEnable(GL_DEPTH_TEST);
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
 
     std::cout<<"Estic inicialitzant el shaders"<<std::ends;
     initShadersGPU();
@@ -186,11 +193,8 @@ void GLWidget::paintGL()
                         RotateY( yRot / 16.0 ) *
                         RotateZ( zRot / 16.0 ) );
 
-
-    if (esc->cotxe!=NULL) {
-        esc->cotxe->aplicaTGCentrat(transform);
-        esc->draw();
-    }
+    esc->aplicaTGCentrat(transform);
+    esc->draw();
 }
 
 void GLWidget::resizeGL(int width, int height)
@@ -248,11 +252,11 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     int dy = event->y() - lastPos.y();
 
     if (event->buttons() & Qt::LeftButton) {
-        setXRotation(xRot + 8 * dy);
+        setXRotation(xRot + 2 * dy);
         //setYRotation(yRot + 8 * dx);
     } else if (event->buttons() & Qt::RightButton) {
-        setYRotation(xRot + 8 * dx);
-        setZRotation(zRot + 8 * dy);
+        setYRotation(xRot + 2 * dx);
+        setZRotation(zRot + 2 * dy);
     }
     lastPos = event->pos();
 }

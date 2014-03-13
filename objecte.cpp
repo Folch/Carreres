@@ -35,8 +35,10 @@ Objecte::Objecte(int npoints, QString n, GLdouble tamanio, GLdouble x0, GLdouble
 
 Objecte::~Objecte()
 {
-    delete points;
-    delete colors;
+    if(points!=NULL)
+        delete points;
+    if(colors!=NULL)
+        delete colors;
 }
 
 
@@ -129,7 +131,7 @@ void Objecte::draw()
     program->setAttributeBuffer("vColor", GL_FLOAT, sizeof(point4) * Index, 4);
 
 
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //glPolygonMode(GL_FRONT_AND_BACK, GL_FA);
     glDrawArrays( GL_TRIANGLES, 0, Index );
 
     // Abans nomes es feia: glDrawArrays( GL_TRIANGLES, 0, NumVerticesP );
