@@ -8,6 +8,7 @@ class Terra : public Objecte
 public:
     Terra(float, float, float);
     Terra();
+    virtual void make();
 
 private:
     void init(float, float, float);

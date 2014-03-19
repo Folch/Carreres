@@ -43,7 +43,8 @@ tindex - second number (texture index)
 nindex - third number (normal vector index)
 ******************************************************************************/
 {
-    char *null = " ";
+    char *null = new char;
+    strcpy(null, " ");
     char *ptr;
     char *tp;
     char *np;

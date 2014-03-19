@@ -1,35 +1,48 @@
 #include "objecte.h"
-#include "readfile.h"
 
-Objecte::Objecte(int npoints, QObject *parent) : numPoints(npoints) ,
-    QObject(parent)
-{
-    points = new point4[npoints];
-    colors = new color4[npoints];
+/*
+ * Mètode que es crida per crear un objecte amb les cares ja montades.
+ *
+ *
+ */
+
+Objecte::Objecte(vector<point4> vertexs, vector<Cara> cares, GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) : numPoints(3*cares.size()){
+    this->cares = cares;
+    this->vertexs = vertexs;
+    init(mida, xorig, yorig, zorig, xrot, yrot, zrot);
+
 }
 
-Objecte::Objecte(int npoints, QString n, GLdouble tamanio, GLdouble x0, GLdouble y0, GLdouble z0, double girx, double giry, double girz) : numPoints(npoints)
-{
-    points = new point4[npoints];
-    colors = new color4[npoints];
-    tam = tamanio;
-    std::cout<<"Estic en el constructor parametritzat del cotxe\n";
-    xorig = x0;
-    yorig = y0;
-    zorig = z0;
+Objecte::Objecte(vector<point4> vertexs, vector<Cara> cares) : numPoints(3*cares.size()){
+    this->cares = cares;
+    this->vertexs = vertexs;
+    init(1,0,0,0,0,0,0);
 
-    xRot = girx;
-    yRot = giry;
-    zRot = girz;
+}
 
+/*
+ * Mètode que es crida, per crear objectes primaris com triangles o quadrats.
+ *
+ *
+ */
 
-    nom = n;
+Objecte::Objecte(int npoints) : numPoints(npoints) {
+    init(1,0,0,0,0,0,0);
+
+}
+
+void Objecte::init(GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) {
+
+    points = new point4[numPoints];
+    colors = new color4[numPoints];
     Index = 0;
-
-    readObj(n);
-
-    make();
-
+    this->tam = mida;
+    this->xorig = xorig;
+    this->yorig = yorig;
+    this->zorig = zorig;
+    this->xRot = xrot;
+    this->yRot = yrot;
+    this->zRot = zrot;
 }
 
 
@@ -101,7 +114,7 @@ void Objecte::toGPU(QGLShaderProgram *pr){
 
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(point4) * Index + sizeof(color4) * Index,
+    glBufferData( GL_ARRAY_BUFFER, sizeof(point4) * numPoints + sizeof(color4) * numPoints,
                   NULL, GL_STATIC_DRAW );
     program->link();
 
@@ -168,130 +181,5 @@ float Objecte::getYOrig() {
     return this->yorig;
 }
 
-
-// Llegeix un fitxer .obj
-//  Si el fitxer referencia fitxers de materials (.mtl), encara no es llegeixen
-//  Tots els elements del fitxer es llegeixen com a un unic objecte.
-//
-
-void Objecte::readObj(QString filename)
-{
-
-    FILE *fp = fopen(filename.toLocal8Bit(),"rb");
-    if (!fp)
-    {
-        cout << "No puc obrir el fitxer " << endl;
-    }
-    else {
-
-        while (true)
-        {
-            char *comment_ptr = fetch_line (fp);
-
-            if (comment_ptr == (char *) -1)  /* end-of-file */
-                break;
-
-            /* did we get a comment? */
-            if (comment_ptr) {
-                //make_comment (comment_ptr);
-                continue;
-            }
-
-            /* if we get here, the line was not a comment */
-            int nwords = fetch_words();
-
-            /* skip empty lines */
-            if (nwords == 0)
-                continue;
-
-            char *first_word = words[0];
-
-            if (!strcmp (first_word, "v"))
-            {
-                if (nwords < 4)
-                {
-                    fprintf (stderr, "Too few coordinates: '%s'", str_orig);
-                    exit (-1);
-                }
-                QString sx(words[1]);
-                QString sy(words[2]);
-                QString sz(words[3]);
-                double x = sx.toDouble();
-                double y = sy.toDouble();
-                double z = sz.toDouble();
-
-                if (nwords == 5)
-                {
-                    QString sw(words[4]);
-                    double w = sw.toDouble();
-                    x/=w;
-                    y/=w;
-                    z/=w;
-                }
-                // S'afegeix el vertex a l'objecte
-                vertexs.push_back(point4(x, y, z, 1));
-
-            }
-            else if (!strcmp (first_word, "vn")) {
-            }
-            else if (!strcmp (first_word, "vt")) {
-            }
-            else if (!strcmp (first_word, "f")) {
-                // S'afegeix la cara a l'objecte
-                construeix_cara (&words[1], nwords-1);
-            }
-            // added
-            else if (!strcmp (first_word, "mtllib")) {
-                //read_mtllib (&words[1], nwords-1, matlib, filename);
-            }
-            else if (!strcmp (first_word, "usemtl")) {
-                //int size = strlen(words[1])-1;
-                //while (size && (words[1][size]=='\n' || words[1][size]=='\r') ) words[1][size--]=0;
-                //currentMaterial = matlib.index(words[1]);
-            }
-            // fadded
-            else {
-                //fprintf (stderr, "Do not recognize: '%s'\n", str_orig);
-            }
-        }
-    }
-
-    capsa = calculCapsa3D();
-}
-
-
-void Objecte::construeix_cara ( char **words, int nwords)
-{
-    Cara face;
-    for (int i = 0; i < nwords; i++)
-    {
-        int vindex;
-        int nindex;
-        int tindex;
-
-        if ((words[i][0]>='0')&&(words[i][0]<='9'))
-        {
-            get_indices (words[i], &vindex, &tindex, &nindex);
-
-#if 0
-            printf ("vtn: %d %d %d\n", vindex, tindex, nindex);
-#endif
-
-            /* store the vertex index */
-
-            if (vindex > 0)       /* indices are from one, not zero */
-                face.idxVertices.push_back(vindex - 1);
-            else if (vindex < 0)  /* negative indices mean count backwards */
-                face.idxVertices.push_back(vertexs.size() + vindex);
-            else
-            {
-                fprintf (stderr, "Zero indices not allowed: '%s'\n", str_orig);
-                exit (-1);
-            }
-        }
-    }
-    face.color = vec4(1.0, 0.0, 0.0, 1.0);
-    cares.push_back(face);
-}
 
 

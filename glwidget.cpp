@@ -6,6 +6,7 @@
 #include "glwidget.h"
 //#include <QGlobal.h>
 #include <QTime>
+#include "readobject.h"
 
 GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
@@ -112,6 +113,7 @@ void GLWidget::adaptaObjecteTamanyWidget(Objecte *obj) {
 void GLWidget::newObjecte(Objecte * obj)
 {
     adaptaObjecteTamanyWidget(obj);
+    obj->make();
     obj->toGPU(program);
     if(dynamic_cast<Terra*>(obj)) {
         esc->addLand((Terra*)obj);
@@ -150,8 +152,16 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
     // Cal modificar-lo per a que es posicioni a la Y correcte
     float yorig = 0;
 
-    obj = new Cotxe(fichero, mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
+    ReadObject *r = new ReadObject();
+    vector<Cara> cares;
+    vector<point4> vertexs;
+    //r.readObj(obj, &cares, &vertexs);
+    obj = r->readCar(fichero, mida, xorig, yorig, zorig, 0.,0.,0., xdirec, ydirec, zdirec );
+
+
+    //obj = new Cotxe(vertexs, cares,mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
     newObjecte(obj);
+    delete r;
 }
 
 void GLWidget::initializeGL()

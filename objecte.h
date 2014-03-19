@@ -20,9 +20,7 @@ class Objecte : public QObject
 {
     Q_OBJECT
 protected:
-    QString nom; // nom del fitxer on esta el cotxe
-    vector<Cara> cares; // cares de l'objecte
-    vector<point4> vertexs; // vertexs de l'objecte sense repetits
+
 
     // Sistema de coordenades d'un objecte: punt origen i eixos de rotació
     GLfloat xorig, yorig, zorig;
@@ -30,8 +28,7 @@ protected:
     float yRot;
     float zRot;
 
-    GLfloat tam; // Escala de l'objecte aplicada al fitxer d'entrada
-
+    GLfloat tam; // Escala de l'objecte plicada al fitxer d'entrada
 
     // Programa de shaders de la GPU
     QGLShaderProgram *program;
@@ -46,27 +43,28 @@ protected:
 
 public:
 
+    vector<Cara> cares; // cares de l'objecte
+    vector<point4> vertexs; // vertexs de l'objecte sense repetits
 
     float getYOrig();
     // Capsa mínima contenidora de l'objecte
     Capsa3D capsa;
 
     //explicit Objecte(QObject *parent = 0);
-    Objecte(const int npoints, QObject *parent = 0);
+    Objecte(vector<point4> vertexs, vector<Cara>,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
+    Objecte(vector<point4> vertexs, vector<Cara>);
 
-    Objecte(const int npoints, QString n, GLdouble tamanio, GLdouble x0, GLdouble y0, GLdouble z0,  double girx, double giry, double girz);
+    Objecte(const int npoints);
 
+    void init(GLfloat,GLfloat,GLfloat,GLfloat,double, double, double);
     ~Objecte();
-
-    // llegeix un model en format OBJ
-    virtual void readObj(QString filename);
 
     // make(): omple l'estructura de points i colors de l'objecte, inicialitza NumVertices
     // Si l'objecte es construeix procedimentalment es sobrecarrega el make
     virtual void make();
 
     // Pas generic de vertexs i colors a la GPU
-    void toGPU(QGLShaderProgram *p);
+    virtual void toGPU(QGLShaderProgram *p);
     // Pintat amb la GPU
     virtual void draw();
 
@@ -74,10 +72,10 @@ public:
     Capsa3D calculCapsa3D();
 
     // Aplica una TG qualsevol a un objecte
-    void aplicaTG(mat4 m);
-    void aplicaTGPoints(mat4 m);
+    virtual void aplicaTG(mat4 m);
+    virtual void aplicaTGPoints(mat4 m);
     // Aplica una TG centrada en el punt central de la capsa de l'objecte a un objecte
-    void aplicaTGCentrat(mat4 m);
+    virtual void aplicaTGCentrat(mat4 m);
 
 private:
     void construeix_cara ( char **words, int nwords);
