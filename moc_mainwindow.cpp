@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'mainwindow.h'
 **
-** Created: Tue Mar 11 12:33:26 2014
+** Created: Wed Mar 19 01:39:18 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!
@@ -48,7 +48,8 @@ static const char qt_meta_stringdata_MainWindow[] = {
     "resetView()\0"
 };
 
-void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a) {
+void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void **_a)
+{
     if (_c == QMetaObject::InvokeMetaMethod) {
         Q_ASSERT(staticMetaObject.cast(_o));
         MainWindow *_t = static_cast<MainWindow *>(_o);
@@ -75,18 +76,21 @@ const QMetaObject MainWindow::staticMetaObject = {
 const QMetaObject &MainWindow::getStaticMetaObject() { return staticMetaObject; }
 #endif //Q_NO_DATA_RELOCATION
 
-const QMetaObject *MainWindow::metaObject() const {
+const QMetaObject *MainWindow::metaObject() const
+{
     return QObject::d_ptr->metaObject ? QObject::d_ptr->metaObject : &staticMetaObject;
 }
 
-void *MainWindow::qt_metacast(const char *_clname) {
+void *MainWindow::qt_metacast(const char *_clname)
+{
     if (!_clname) return 0;
     if (!strcmp(_clname, qt_meta_stringdata_MainWindow))
         return static_cast<void*>(const_cast< MainWindow*>(this));
     return QMainWindow::qt_metacast(_clname);
 }
 
-int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a) {
+int MainWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
+{
     _id = QMainWindow::qt_metacall(_c, _id, _a);
     if (_id < 0)
         return _id;
