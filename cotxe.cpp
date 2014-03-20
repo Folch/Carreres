@@ -124,7 +124,7 @@ void Cotxe::forward(){
     /*Fer moure les rodes*/
     for(int i = 0; i<4; i++) {
         Capsa3D capsa = rodes[i]->calculCapsa3D();
-        mat4 m = Translate(capsa.pmig.x, capsa.pmig.y, capsa.pmig.z)*RotateZ(8)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
+        mat4 m = Translate(capsa.pmig.x, capsa.pmig.y, capsa.pmig.z)*RotateZ(10)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
         rodes[i]->aplicaTG(m);
     }
 }
@@ -132,6 +132,12 @@ void Cotxe::forward(){
 void Cotxe::backward(){
     // Metode a implementar per fer el moviment del cotxe
 
+    /*Fer moure les rodes*/
+    for(int i = 0; i<4; i++) {
+        Capsa3D capsa = rodes[i]->calculCapsa3D();
+        mat4 m = Translate(capsa.pmig.x, capsa.pmig.y, capsa.pmig.z)*RotateZ(-10)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
+        rodes[i]->aplicaTG(m);
+    }
 }
 
 void Cotxe::turnleft(){

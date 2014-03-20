@@ -284,7 +284,8 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         updateGL();
         break;
     case Qt::Key_Down:
-
+        esc->myCar->backward();
+        updateGL();
         break;
     case Qt::Key_Left:
 
