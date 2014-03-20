@@ -1,7 +1,7 @@
 /****************************************************************************
 ** Meta object code from reading C++ file 'newterradialog.h'
 **
-** Created: Tue Mar 11 09:59:39 2014
+** Created: Thu Mar 20 10:06:21 2014
 **      by: The Qt Meta Object Compiler version 63 (Qt 4.8.4)
 **
 ** WARNING! All changes made in this file will be lost!

@@ -7,7 +7,6 @@
 #include <QGLWidget>
 #include <QtGui>
 
-
 #define PROGRAM_VERTEX_ATTRIBUTE 0
 #define PROGRAM_COLOR_ATTRIBUTE 1
 

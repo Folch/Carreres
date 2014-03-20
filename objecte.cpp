@@ -31,6 +31,11 @@ Objecte::Objecte(int npoints) : numPoints(npoints) {
 
 }
 
+Objecte::Objecte(int npoints, GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) : numPoints(npoints) {
+    init(mida, xorig, yorig, zorig, xrot, yrot, zrot);
+
+}
+
 void Objecte::init(GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) {
 
     points = new point4[numPoints];
@@ -43,6 +48,12 @@ void Objecte::init(GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,doubl
     this->xRot = xrot;
     this->yRot = yrot;
     this->zRot = zrot;
+
+    this->mode = GL_LINES;
+
+    this->capsa.a = 0;
+    this->capsa.h = 0;
+    this->capsa.p = 0;
 }
 
 
@@ -54,15 +65,50 @@ Objecte::~Objecte()
         delete colors;
 }
 
+/*
+ *  typedef struct {
+          vec3 pmin;
+          GLfloat a, h, p;
+    } Capsa3D;
 
-Capsa3D Objecte::calculCapsa3D()
-{
-
+ */
+Capsa3D Objecte::calculCapsa3D() {
     // Metode a implementar: calcula la capsa mínima contenidora d'un objecte
 
-    vec3    pmin, pmax;
+    GLfloat a_min = std::numeric_limits<int>::max(),
+            a_max = std::numeric_limits<int>::min(),
+            h_min = std::numeric_limits<int>::max(),
+            h_max = std::numeric_limits<int>::min(),
+            p_min = std::numeric_limits<int>::max(),
+            p_max = std::numeric_limits<int>::min();
 
+    //vec3(a,h,p)
+    for (int i = 0; i < Index; i++) {
+        if(points[i].x>a_max)
+            a_max = points[i].x;
+        if(points[i].x<a_min)
+            a_min = points[i].x;
+        if(points[i].y>h_max)
+            h_max = points[i].y;
+        if(points[i].y<h_min)
+            h_min = points[i].y;
+        if(points[i].z>p_max)
+            p_max = points[i].z;
+        if(points[i].z<p_min)
+            p_min = points[i].z;
+    }
+    Capsa3D capsa;
+    capsa.pmin = vec3(a_min, h_min, p_min);
+    capsa.a = a_max - a_min;
+    capsa.h = h_max - h_min;
+    capsa.p = p_max - p_min;
+    capsa.pmig_xz = vec3(a_min+capsa.a/2.0f,h_min,p_min+capsa.p/2.0f);
+    capsa.pmig = vec3(a_min+capsa.a/2.0f,h_min+capsa.h/2.0f,p_min+capsa.p/2.0f);
+    capsa.max_size = max(capsa.a, max(capsa.h, capsa.p));
+
+    this->capsa = capsa;
     return capsa;
+
 }
 
 
@@ -83,14 +129,14 @@ void Objecte::aplicaTGPoints(mat4 m)
 {
     point4  *transformed_points = new point4[Index];
 
-    for ( int i = 0; i < Index; ++i ) {
+    for ( int i = 0; i < Index; i++) {
         transformed_points[i] = m * points[i];
     }
 
     transformed_points = &transformed_points[0];
     points = &points[0];
 
-    for ( int i = 0; i < Index; ++i )
+    for ( int i = 0; i < Index; i++ )
     {
         points[i] = transformed_points[i];
     }
@@ -98,15 +144,13 @@ void Objecte::aplicaTGPoints(mat4 m)
     delete transformed_points;
 }
 
-void Objecte::aplicaTGCentrat(mat4 m)
-{
-
+void Objecte::aplicaTGCentrat(mat4 m) {
     // Metode a modificar
-    aplicaTGPoints(m);
+    aplicaTGPoints(m); //This function is called in aplicaTG.
     aplicaTG(m);
 }
 
-void Objecte::toGPU(QGLShaderProgram *pr){
+void Objecte::toGPU(QGLShaderProgram *pr) {
 
     program = pr;
 
@@ -114,7 +158,7 @@ void Objecte::toGPU(QGLShaderProgram *pr){
 
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(point4) * numPoints + sizeof(color4) * numPoints,
+    glBufferData( GL_ARRAY_BUFFER, sizeof(point4) * Index + sizeof(color4) * Index,
                   NULL, GL_STATIC_DRAW );
     program->link();
 
@@ -145,7 +189,7 @@ void Objecte::draw()
 
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_FA);
-    glDrawArrays( GL_TRIANGLES, 0, Index );
+    glDrawArrays(mode, 0, Index );
 
     // Abans nomes es feia: glDrawArrays( GL_TRIANGLES, 0, NumVerticesP );
 }
@@ -173,8 +217,9 @@ void Objecte::make()
             Index++;
         }
     }
-
     // S'ha de dimensionar uniformement l'objecte a la capsa de l'escena i s'ha posicionar en el lloc corresponent
+
+    //calculCapsa3D();
 }
 
 float Objecte::getYOrig() {

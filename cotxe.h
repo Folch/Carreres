@@ -16,6 +16,7 @@ public:
 
     virtual void make();
     virtual void draw();
+    virtual Capsa3D calculCapsa3D();
     virtual void aplicaTG(mat4);
     virtual void aplicaTGCentrat(mat4);
     virtual void aplicaTGPoints(mat4);

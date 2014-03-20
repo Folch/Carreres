@@ -7,7 +7,8 @@
 
 #include <Common.h>
 #include <cara.h>
-
+#include <limits>
+#include <math.h>
 
 #include <QGLShaderProgram>
 
@@ -27,6 +28,8 @@ protected:
     float xRot;
     float yRot;
     float zRot;
+
+    GLenum mode;
 
     GLfloat tam; // Escala de l'objecte plicada al fitxer d'entrada
 
@@ -51,10 +54,11 @@ public:
     Capsa3D capsa;
 
     //explicit Objecte(QObject *parent = 0);
-    Objecte(vector<point4> vertexs, vector<Cara>,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
+    Objecte(vector<point4> vertexsz, vector<Cara>,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
     Objecte(vector<point4> vertexs, vector<Cara>);
 
     Objecte(const int npoints);
+    Objecte(const int npoints,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
 
     void init(GLfloat,GLfloat,GLfloat,GLfloat,double, double, double);
     ~Objecte();
@@ -69,7 +73,7 @@ public:
     virtual void draw();
 
     // Calcula la capsa 3D contenidora de l'objecte
-    Capsa3D calculCapsa3D();
+    virtual Capsa3D calculCapsa3D();
 
     // Aplica una TG qualsevol a un objecte
     virtual void aplicaTG(mat4 m);

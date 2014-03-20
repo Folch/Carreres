@@ -114,6 +114,7 @@ void GLWidget::newObjecte(Objecte * obj)
 {
     adaptaObjecteTamanyWidget(obj);
     obj->make();
+    //obj->calculCapsa3D();
     obj->toGPU(program);
     if(dynamic_cast<Terra*>(obj)) {
         esc->addLand((Terra*)obj);
@@ -131,6 +132,10 @@ void GLWidget::newObstacle(int nombre)
 
     // Metode a implementar
 
+    Obstacle *o;
+
+    o = new Obstacle();
+    newObjecte(o);
 }
 void GLWidget::newTerra(float amplaria, float profunditat, float y)
 {
@@ -161,6 +166,7 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
 
     //obj = new Cotxe(vertexs, cares,mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
     newObjecte(obj);
+
     delete r;
 }
 
@@ -190,9 +196,7 @@ void GLWidget::resetView()
     updateGL();
 }
 
-void GLWidget::paintGL()
-{
-
+void GLWidget::paintGL() {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
 
     qNormalizeAngle(xRot);
@@ -207,8 +211,7 @@ void GLWidget::paintGL()
     esc->draw();
 }
 
-void GLWidget::resizeGL(int width, int height)
-{
+void GLWidget::resizeGL(int width, int height) {
     int side = qMin(width, height);
     glViewport((width - side) / 2, (height - side) / 2, side, side);
 
@@ -277,7 +280,8 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
     switch ( event->key() )
     {
     case Qt::Key_Up:
-
+        esc->myCar->forward();
+        updateGL();
         break;
     case Qt::Key_Down:
 

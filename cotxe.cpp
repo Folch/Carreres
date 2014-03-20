@@ -7,12 +7,26 @@ Cotxe::Cotxe(vector<point4> vertexs, vector<Cara> cares, GLfloat mida, GLfloat x
     this->direction[1] = 0;
     this->direction[2] = 0;
     this->direction[3] = 0;
+}
 
-    // El seguent codi escala el cotxe entre 0 i 1 i el situa el seu centre  0,0,0. aixo fa que es vegi en la primera visualització
-    //
-    // Cal modificar el codi seguent
+Capsa3D Cotxe::calculCapsa3D(){
+    points = new point4[10];
+    numPoints = 10;
+    Index = 10;
+    Capsa3D capsa;
+    for (int i = 0; i < 8; i+=2) {
+        capsa = rodes[i/2]->calculCapsa3D();
+        points[i] = point4(capsa.pmin.x, capsa.pmin.y, capsa.pmin.z, 1.0f);
+        points[i+1] = point4(capsa.pmin.x+capsa.a, capsa.pmin.y+capsa.h, capsa.pmin.z+capsa.p, 1.0f);
+    }
 
+    if(carrosseria != NULL) {
+        capsa = carrosseria->calculCapsa3D();
+        points[8] = point4(capsa.pmin.x, capsa.pmin.y, capsa.pmin.z, 1.0f);
+        points[9] = point4(capsa.pmin.x+capsa.a, capsa.pmin.y+capsa.h, capsa.pmin.z+capsa.p, 1.0f);
+    }
 
+    return Objecte::calculCapsa3D();
 }
 
 void Cotxe::make() {
@@ -22,10 +36,15 @@ void Cotxe::make() {
     if(carrosseria != NULL)
         carrosseria->make();
 
-    double escalaX = 1.0 / 4.6;
-    mat4 m= Translate(-1.93*escalaX, (+0.26)*escalaX, -2.16*escalaX)*Scale(escalaX, escalaX, escalaX)*Translate(+1.93, -0.26, 2.16);
+    Capsa3D capsa = calculCapsa3D();
 
-    aplicaTG(m);
+    //translate to (0,0,0)
+    //scale
+    //translate (xorig,yorig,zorig)
+
+    GLfloat escale = tam/capsa.max_size;
+    mat4 m= Translate(xorig, yorig, zorig)*Scale(escale,escale,escale)*Translate(-capsa.pmig_xz.x, -capsa.pmig_xz.y, -capsa.pmig_xz.z);
+    this->aplicaTG(m);
 }
 
 void Cotxe::addComponent(Objecte *obj) {
@@ -101,6 +120,13 @@ void Cotxe::draw() {
 
 void Cotxe::forward(){
     // Metode a implementar per fer el moviment del cotxe
+
+    /*Fer moure les rodes*/
+    for(int i = 0; i<4; i++) {
+        Capsa3D capsa = rodes[i]->calculCapsa3D();
+        mat4 m = Translate(capsa.pmig.x, capsa.pmig.y, capsa.pmig.z)*RotateZ(8)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
+        rodes[i]->aplicaTG(m);
+    }
 }
 
 void Cotxe::backward(){

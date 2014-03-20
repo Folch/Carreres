@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'newcotxedialog.ui'
 **
-** Created: Tue Mar 11 09:51:32 2014
+** Created: Thu Mar 20 10:05:56 2014
 **      by: Qt User Interface Compiler version 4.8.4
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!

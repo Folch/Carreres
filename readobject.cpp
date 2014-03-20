@@ -23,10 +23,8 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
 
     FILE *fp = fopen(filename.toLocal8Bit(),"rb");
     Objecte *currentObj = NULL;
-    vector<Cara> *caresTmp;
-    vector<point4> *vertexsTmp;
-    vertexsTmp = new vector<point4>();
-    caresTmp = new vector<Cara>();
+    vector<Cara> caresTmp;
+    vector<point4> vertexsTmp;
     char objType[25];
     if (!fp)
     {
@@ -44,19 +42,21 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
             if (comment_ptr == (char *) -1) {
                 /* end-of-file */
                 if(!strcmp (objType, "Roda_Esquerra_Posterior_Untitled")) {
-                    currentObj = new Roda(*vertexsTmp, *caresTmp);
+                    currentObj = new Roda(vertexsTmp, caresTmp);
                     ((Roda*)currentObj)->type = ESQUERRA_POSTERIOR;
                 }else if(!strcmp (objType, "Roda_Dreta_Posterior_04")){
-                    currentObj = new Roda(*vertexsTmp, *caresTmp);
+                    currentObj = new Roda(vertexsTmp, caresTmp);
                     ((Roda*)currentObj)->type = DRETA_POSTERIOR;
                 }else if(!strcmp (objType, "Roda_Esquerra_Davantera_02")){
-                    currentObj = new Roda(*vertexsTmp, *caresTmp);
+                    currentObj = new Roda(vertexsTmp, caresTmp);
                     ((Roda*)currentObj)->type = ESQUERRA_DAVANTERA;
                 }else if(!strcmp (objType, "Roda_Dreta_Davantera_03")){
-                    currentObj = new Roda(*vertexsTmp, *caresTmp);
+                    currentObj = new Roda(vertexsTmp, caresTmp);
                     ((Roda*)currentObj)->type = DRETA_DAVANTERA;
                 }else if(!strcmp (objType, "Carrosseria_00")){
-                    currentObj = new Carrosseria(*vertexsTmp, *caresTmp);
+                    currentObj = new Carrosseria(vertexsTmp, caresTmp);
+                }else{
+                    break;
                 }
                 ((Cotxe*)obj)->addComponent(currentObj);
                 break;
@@ -101,7 +101,7 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
                 }
                 // S'afegeix el vertex a l'objecte
                 point4 pTmp = point4(x, y, z, 1);
-                vertexsTmp->push_back(pTmp);
+                vertexsTmp.push_back(pTmp);
                 vindexAct++;
 
             }
@@ -111,7 +111,7 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
             }
             else if (!strcmp (first_word, "f")) {
                 // S'afegeix la cara a l'objecte
-                this->buildFace(&words[1], nwords-1, caresTmp, vertexsTmp, vindexUlt);
+                this->buildFace(&words[1], nwords-1, &caresTmp, &vertexsTmp, vindexUlt);
             }
 
             // added
@@ -125,25 +125,29 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
             }
             else if (!strcmp (first_word, "o")) {
                 if(dynamic_cast<Cotxe*>(obj)) {
-                    if(!vertexsTmp->empty()){
+                    if(!vertexsTmp.empty()){
                         if(!strcmp (objType, "Roda_Esquerra_Posterior_Untitled")) {
-                            currentObj = new Roda(*vertexsTmp, *caresTmp);
+                            currentObj = new Roda(vertexsTmp, caresTmp);
                             ((Roda*)currentObj)->type = ESQUERRA_POSTERIOR;
                         }else if(!strcmp (objType, "Roda_Dreta_Posterior_04")){
-                            currentObj = new Roda(*vertexsTmp, *caresTmp);
+                            currentObj = new Roda(vertexsTmp, caresTmp);
                             ((Roda*)currentObj)->type = DRETA_POSTERIOR;
                         }else if(!strcmp (objType, "Roda_Esquerra_Davantera_02")){
-                            currentObj = new Roda(*vertexsTmp, *caresTmp);
+                            currentObj = new Roda(vertexsTmp, caresTmp);
                             ((Roda*)currentObj)->type = ESQUERRA_DAVANTERA;
                         }else if(!strcmp (objType, "Roda_Dreta_Davantera_03")){
-                            currentObj = new Roda(*vertexsTmp, *caresTmp);
+                            currentObj = new Roda(vertexsTmp, caresTmp);
                             ((Roda*)currentObj)->type = DRETA_DAVANTERA;
                         }else if(!strcmp (objType, "Carrosseria_00")){
-                            currentObj = new Carrosseria(*vertexsTmp, *caresTmp);
+                            currentObj = new Carrosseria(vertexsTmp, caresTmp);
+                        }else{
+                            strcpy(objType,words[1]);
+                            vindexUlt = vindexAct;
+                            continue;
                         }
                         ((Cotxe*)obj)->addComponent(currentObj);
-                        vertexsTmp = new vector<point4>();
-                        caresTmp = new vector<Cara>();
+                        caresTmp.clear();
+                        vertexsTmp.clear();
                     }
                 }
                 strcpy(objType,words[1]);

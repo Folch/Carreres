@@ -22,6 +22,9 @@ void escena::addLand(Terra *t) {
 }
 
 void escena::addObjecte(Objecte *obj) {
+    /* El primer cotxe que entri per aquí, serà el cotxe que controlaré mitjançant el pad */
+    if(vObjectes.empty() && dynamic_cast<Cotxe*>(obj))
+        myCar = (Cotxe*)obj;
     vObjectes.push_back(obj);
 }
 
