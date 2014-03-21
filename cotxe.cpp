@@ -7,6 +7,9 @@ Cotxe::Cotxe(vector<point4> vertexs, vector<Cara> cares, GLfloat mida, GLfloat x
     this->direction[1] = 0;
     this->direction[2] = 0;
     this->direction[3] = 0;
+
+    this->rotateRodes = 0;
+    this->rotateCotxe = 0;
 }
 
 Capsa3D Cotxe::calculCapsa3D(){
@@ -43,7 +46,7 @@ void Cotxe::make() {
     //translate (xorig,yorig,zorig)
 
     GLfloat escale = tam/capsa.max_size;
-    mat4 m= Translate(xorig, yorig, zorig)*Scale(escale,escale,escale)*Translate(-capsa.pmig_xz.x, -capsa.pmig_xz.y, -capsa.pmig_xz.z);
+    mat4 m = Translate(xorig, yorig, zorig)*Scale(escale,escale,escale)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
     this->aplicaTG(m);
 }
 
@@ -51,7 +54,7 @@ void Cotxe::addComponent(Objecte *obj) {
     /*
      *        __
      *       |  |
-     *   0 |-|  |-| 1
+     *   1 |-|  |-| 0
      *       /  \
      *      /    \
      *     /      \
@@ -59,7 +62,7 @@ void Cotxe::addComponent(Objecte *obj) {
      *     |      |
      *     |      |
      *     |      |
-     * 2 |-|      |-| 3
+     * 3 |-|      |-| 2
      *     |______|
      *
      *
@@ -86,6 +89,10 @@ void Cotxe::toGPU(QGLShaderProgram *p) {
         carrosseria->toGPU(p);
 }
 
+void Cotxe::aplicaTGRodes(mat4 m) {
+
+}
+
 void Cotxe::aplicaTG(mat4 m) {
     for (int i = 0; i < 4; i++) {
         rodes[i]->aplicaTG(m);
@@ -95,11 +102,14 @@ void Cotxe::aplicaTG(mat4 m) {
 }
 
 void Cotxe::aplicaTGCentrat(mat4 m) {
+     mat4 mo = m;
+    if(rotateCotxe != 0)
+        mo = RotateY(this->rotateCotxe)*m*RotateY(-this->rotateCotxe);
     for (int i = 0; i < 4; i++) {
-        rodes[i]->aplicaTGCentrat(m);
+        rodes[i]->aplicaTGCentrat(mo);
     }
     if(carrosseria != NULL)
-        carrosseria->aplicaTGCentrat(m);
+        carrosseria->aplicaTGCentrat(mo);
 }
 
 void Cotxe::aplicaTGPoints(mat4 m) {
@@ -121,31 +131,63 @@ void Cotxe::draw() {
 void Cotxe::forward(){
     // Metode a implementar per fer el moviment del cotxe
 
+    aplicaTGCentrat(Translate(-0.005,0,0)*RotateY(rotateCotxe));
+
     /*Fer moure les rodes*/
-    for(int i = 0; i<4; i++) {
-        Capsa3D capsa = rodes[i]->calculCapsa3D();
-        mat4 m = Translate(capsa.pmig.x, capsa.pmig.y, capsa.pmig.z)*RotateZ(10)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
-        rodes[i]->aplicaTG(m);
-    }
+     //aplicaTGRodes(RotateZ(10));
+    /*mat4 m = RotateZ(10);
+    mat4 mo = RotateY(this->rotateCotxe)*m*RotateY(-this->rotateCotxe);
+    mat4 mo2 = RotateY(this->rotateRodes)*mo*RotateY(-this->rotateRodes);
+
+    rodes[0]->aplicaTGCentrat(mo2);
+    rodes[1]->aplicaTGCentrat(mo2);
+    rodes[2]->aplicaTGCentrat(mo);
+    rodes[3]->aplicaTGCentrat(mo);*/
 }
 
 void Cotxe::backward(){
     // Metode a implementar per fer el moviment del cotxe
 
+    aplicaTGCentrat(Translate(0.005,0,0)*RotateY(-rotateCotxe));
+
     /*Fer moure les rodes*/
-    for(int i = 0; i<4; i++) {
-        Capsa3D capsa = rodes[i]->calculCapsa3D();
-        mat4 m = Translate(capsa.pmig.x, capsa.pmig.y, capsa.pmig.z)*RotateZ(-10)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
-        rodes[i]->aplicaTG(m);
-    }
+    //aplicaTGRodes(RotateZ(-10));
+    /*mat4 m = RotateZ(-10);
+    mat4 mo = RotateY(this->rotateCotxe)*m*RotateY(-this->rotateCotxe);
+    mat4 mo2 = RotateY(this->rotateRodes)*mo*RotateY(-this->rotateRodes);
+
+    rodes[0]->aplicaTGCentrat(mo2);
+    rodes[1]->aplicaTGCentrat(mo2);
+    rodes[2]->aplicaTGCentrat(mo);
+    rodes[3]->aplicaTGCentrat(mo);*/
 }
 
 void Cotxe::turnleft(){
     // Metode a implementar per fer el moviment del cotxe
-
+    rotateRodes -= 5;
+    if(rotateRodes>=-45) {
+        rodes[0]->aplicaTGCentrat(RotateY(-5));
+        rodes[1]->aplicaTGCentrat(RotateY(-5));
+    }else{
+        rotateRodes = -45;
+    }
+    if(rotateRodes != 0)
+        rotateCotxe = -1;
+    else
+        rotateCotxe = 0;
 }
 
 void Cotxe::turnright(){
     // Metode a implementar per fer el moviment del cotxe
-
+    rotateRodes += 5;
+    if(rotateRodes<=45) {
+        rodes[0]->aplicaTGCentrat(RotateY(5));
+        rodes[1]->aplicaTGCentrat(RotateY(5));
+    }else{
+        rotateRodes = 45;
+    }
+    if(rotateRodes != 0)
+        rotateCotxe = 1;
+    else
+        rotateCotxe = 0;
 }

@@ -21,6 +21,7 @@ public:
     virtual void aplicaTGCentrat(mat4);
     virtual void aplicaTGPoints(mat4);
     virtual void toGPU(QGLShaderProgram*);
+    void aplicaTGRodes(mat4);
 
     void forward();
     void backward();
@@ -32,6 +33,8 @@ public:
 private:
     Roda* rodes[4];
     Carrosseria *carrosseria;
+    float rotateCotxe;
+    float rotateRodes;
 
 };
 

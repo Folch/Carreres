@@ -102,7 +102,6 @@ Capsa3D Objecte::calculCapsa3D() {
     capsa.a = a_max - a_min;
     capsa.h = h_max - h_min;
     capsa.p = p_max - p_min;
-    capsa.pmig_xz = vec3(a_min+capsa.a/2.0f,h_min,p_min+capsa.p/2.0f);
     capsa.pmig = vec3(a_min+capsa.a/2.0f,h_min+capsa.h/2.0f,p_min+capsa.p/2.0f);
     capsa.max_size = max(capsa.a, max(capsa.h, capsa.p));
 
@@ -145,9 +144,8 @@ void Objecte::aplicaTGPoints(mat4 m)
 }
 
 void Objecte::aplicaTGCentrat(mat4 m) {
-    // Metode a modificar
-    aplicaTGPoints(m); //This function is called in aplicaTG.
-    aplicaTG(m);
+    Capsa3D c = calculCapsa3D();
+    aplicaTG(Translate(c.pmig.x, c.pmig.y, c.pmig.z)*m*Translate(-c.pmig.x, -c.pmig.y, -c.pmig.z));
 }
 
 void Objecte::toGPU(QGLShaderProgram *pr) {
@@ -219,7 +217,6 @@ void Objecte::make()
     }
     // S'ha de dimensionar uniformement l'objecte a la capsa de l'escena i s'ha posicionar en el lloc corresponent
 
-    //calculCapsa3D();
 }
 
 float Objecte::getYOrig() {

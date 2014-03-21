@@ -54,7 +54,7 @@ void MainWindow::acceptedNewTerra(float amplaria, float profunditat, float y)
 
 void MainWindow::acceptedNewCotxe(float escala, float x, float z, float xdirector, float ydirector, float zdirector)
 {
-    QString fileName = QFileDialog::getOpenFileName(this);
+    QString fileName = "./dataSet/ferrariParts.obj";//QFileDialog::getOpenFileName(this);
     if (!fileName.isNull())
         this->glWidget->newCotxe(fileName, x, z, escala, xdirector, ydirector, zdirector);
 }

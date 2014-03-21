@@ -108,12 +108,14 @@ static void qNormalizeAngle(int &angle)
 void GLWidget::adaptaObjecteTamanyWidget(Objecte *obj) {
 
     // Metode a implementar
+    //double scale = obj->calculCapsa3D().max_size/50.0f;
+    //obj->aplicaTGCentrat(Scale(scale, scale, scale));
 }
 
 void GLWidget::newObjecte(Objecte * obj)
 {
-    adaptaObjecteTamanyWidget(obj);
     obj->make();
+    adaptaObjecteTamanyWidget(obj);
     //obj->calculCapsa3D();
     obj->toGPU(program);
     if(dynamic_cast<Terra*>(obj)) {
@@ -207,7 +209,7 @@ void GLWidget::paintGL() {
                         RotateY( yRot / 16.0 ) *
                         RotateZ( zRot / 16.0 ) );
 
-    esc->aplicaTGCentrat(transform);
+    esc->aplicaTG(transform);
     esc->draw();
 }
 
@@ -288,10 +290,12 @@ void GLWidget::keyPressEvent(QKeyEvent *event)
         updateGL();
         break;
     case Qt::Key_Left:
-
+        esc->myCar->turnleft();
+        updateGL();
         break;
     case Qt::Key_Right:
-
+        esc->myCar->turnright();
+        updateGL();
         break;
     }
 

@@ -77,7 +77,6 @@ using namespace Common;
 typedef struct {
       vec3 pmin;
       vec3 pmig;
-      vec3 pmig_xz; //punt mig sense tenir en compte l'alçada
       GLfloat max_size;
       GLfloat a, h, p;
 } Capsa3D;
