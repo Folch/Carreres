@@ -108,8 +108,8 @@ static void qNormalizeAngle(int &angle)
 void GLWidget::adaptaObjecteTamanyWidget(Objecte *obj) {
 
     // Metode a implementar
-    //double scale = obj->calculCapsa3D().max_size/50.0f;
-    //obj->aplicaTGCentrat(Scale(scale, scale, scale));
+    mat4 m = Translate(0.04f*obj->xorig, 0.04f*obj->yorig, 0.04f*obj->zorig)*esc->scaleScene*Translate(-obj->xorig, -obj->yorig, -obj->zorig);
+    obj->aplicaTG(m);
 }
 
 void GLWidget::newObjecte(Objecte * obj)
@@ -118,6 +118,7 @@ void GLWidget::newObjecte(Objecte * obj)
     adaptaObjecteTamanyWidget(obj);
     //obj->calculCapsa3D();
     obj->toGPU(program);
+    obj->backupPoints();
     if(dynamic_cast<Terra*>(obj)) {
         esc->addLand((Terra*)obj);
     }else{
@@ -135,9 +136,24 @@ void GLWidget::newObstacle(int nombre)
     // Metode a implementar
 
     Obstacle *o;
-
-    o = new Obstacle();
-    newObjecte(o);
+    srand(time(NULL));
+    int i = 0;
+    while(i<nombre) {
+        double x = rand() % 51 - 25.0;
+        double z = rand() %51 - 25.0;
+        o = new Obstacle(x,0,z,5.0);
+        o->make();
+        adaptaObjecteTamanyWidget(o);
+        if(esc->isCollision(o)) {
+            i--;
+            delete o;
+        }else {
+            delete o;
+            o = new Obstacle(x,0,z,5.0);
+            newObjecte(o);
+        }
+        i++;
+    }
 }
 void GLWidget::newTerra(float amplaria, float profunditat, float y)
 {
@@ -276,29 +292,36 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event)
     lastPos = event->pos();
 }
 
-void GLWidget::keyPressEvent(QKeyEvent *event)
-{
+void GLWidget::keyPressEvent(QKeyEvent *event) {
     // Metode a implementar
-    switch ( event->key() )
-    {
-    case Qt::Key_Up:
-        esc->myCar->forward();
-        updateGL();
-        break;
-    case Qt::Key_Down:
-        esc->myCar->backward();
-        updateGL();
-        break;
-    case Qt::Key_Left:
-        esc->myCar->turnleft();
-        updateGL();
-        break;
-    case Qt::Key_Right:
-        esc->myCar->turnright();
-        updateGL();
-        break;
-    }
 
+    switch ( event->key() ){
+        case Qt::Key_Up:
+            if(!esc->isCollision(esc->myCar)){
+                esc->myCar->backupPoints();
+                esc->myCar->forward();
+            }
+            else
+                esc->myCar->restorePoints();
+            updateGL();
+            break;
+        case Qt::Key_Down:
+            if(!esc->isCollision(esc->myCar)){
+                esc->myCar->backupPoints();
+                esc->myCar->backward();
+            }else
+                esc->myCar->restorePoints();
+            updateGL();
+            break;
+        case Qt::Key_Left:
+            esc->myCar->turnleft();
+            updateGL();
+            break;
+        case Qt::Key_Right:
+            esc->myCar->turnright();
+            updateGL();
+            break;
+    }
 }
 void GLWidget::keyReleaseEvent(QKeyEvent *event)
 {

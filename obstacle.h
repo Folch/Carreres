@@ -5,7 +5,8 @@
 
 class Obstacle : public Objecte {
     public:
-        Obstacle();
+        Obstacle(double, double, double, double);
+        Obstacle(vector<point4>, vector<Cara>);
         virtual void make();
 
     private:

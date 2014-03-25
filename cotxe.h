@@ -17,17 +17,20 @@ public:
     virtual void make();
     virtual void draw();
     virtual Capsa3D calculCapsa3D();
+    virtual void restorePoints();
+    virtual void backupPoints();
     virtual void aplicaTG(mat4);
     virtual void aplicaTGCentrat(mat4);
     virtual void aplicaTGPoints(mat4);
     virtual void toGPU(QGLShaderProgram*);
+    virtual bool isCollision(Objecte *);
     void aplicaTGRodes(mat4);
 
     void forward();
     void backward();
     void turnleft();
     void turnright();
-    point4 direction;
+    vec3 direction; //direcció inicial
     void addComponent(Objecte *obj);
 
 private:

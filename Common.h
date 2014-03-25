@@ -75,6 +75,7 @@ readShaderSource(const char* shaderFile);
 using namespace Common;
 
 typedef struct {
+      vec3 pmax;
       vec3 pmin;
       vec3 pmig;
       GLfloat max_size;

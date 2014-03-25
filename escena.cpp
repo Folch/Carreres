@@ -8,6 +8,8 @@ escena::escena() {
     capsaMinima.a = 1; capsaMinima.h = 1; capsaMinima.p = 1;
 
     terra = NULL;
+
+    scaleScene = Scale(0.04f, 0.04f, 0.04f); //2/50 = 0.04
 }
 
 
@@ -23,7 +25,7 @@ void escena::addLand(Terra *t) {
 
 void escena::addObjecte(Objecte *obj) {
     /* El primer cotxe que entri per aquí, serà el cotxe que controlaré mitjançant el pad */
-    if(vObjectes.empty() && dynamic_cast<Cotxe*>(obj))
+    if(dynamic_cast<Cotxe*>(obj))
         myCar = (Cotxe*)obj;
     vObjectes.push_back(obj);
 }
@@ -64,3 +66,13 @@ void escena::reset() {
         terra->make();
 }
 
+bool escena::isCollision(Objecte* obj){
+    bool trobat;
+    for(unsigned int i=0; i<vObjectes.size(); i++) {
+        if(obj != vObjectes[i]) {
+            trobat = vObjectes[i]->isCollision(obj);
+            if (trobat) return true;
+        }
+    }
+    return false;
+}

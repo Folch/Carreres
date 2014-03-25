@@ -3,6 +3,7 @@
 
 #include "cotxe.h"
 #include "objecte.h"
+#include "obstacle.h"
 #include "roda.h"
 #include "cara.h"
 

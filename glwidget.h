@@ -2,6 +2,7 @@
 #define GLWIDGET_H
 
 #include <escena.h>
+#include <stdlib.h>
 
 #include <QtOpenGL>
 #include <QGLWidget>

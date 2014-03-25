@@ -28,7 +28,6 @@ Objecte::Objecte(vector<point4> vertexs, vector<Cara> cares) : numPoints(3*cares
 
 Objecte::Objecte(int npoints) : numPoints(npoints) {
     init(1,0,0,0,0,0,0);
-
 }
 
 Objecte::Objecte(int npoints, GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) : numPoints(npoints) {
@@ -39,6 +38,7 @@ Objecte::Objecte(int npoints, GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat 
 void Objecte::init(GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) {
 
     points = new point4[numPoints];
+    pointsTmp = new point4[numPoints];
     colors = new color4[numPoints];
     Index = 0;
     this->tam = mida;
@@ -99,11 +99,13 @@ Capsa3D Objecte::calculCapsa3D() {
     }
     Capsa3D capsa;
     capsa.pmin = vec3(a_min, h_min, p_min);
+    capsa.pmax = vec3(a_max,h_max,p_max);
     capsa.a = a_max - a_min;
     capsa.h = h_max - h_min;
     capsa.p = p_max - p_min;
     capsa.pmig = vec3(a_min+capsa.a/2.0f,h_min+capsa.h/2.0f,p_min+capsa.p/2.0f);
     capsa.max_size = max(capsa.a, max(capsa.h, capsa.p));
+
 
     this->capsa = capsa;
     return capsa;
@@ -126,7 +128,7 @@ void Objecte::aplicaTG(mat4 m)
 
 void Objecte::aplicaTGPoints(mat4 m)
 {
-    point4  *transformed_points = new point4[Index];
+    point4 *transformed_points = new point4[Index];
 
     for ( int i = 0; i < Index; i++) {
         transformed_points[i] = m * points[i];
@@ -141,6 +143,16 @@ void Objecte::aplicaTGPoints(mat4 m)
     }
 
     delete transformed_points;
+}
+
+void Objecte::backupPoints() {
+    for ( int i = 0; i < Index; i++ )
+        pointsTmp[i] = points[i];
+}
+
+void Objecte::restorePoints() {
+    for ( int i = 0; i < Index; i++ )
+        points[i] = pointsTmp[i];
 }
 
 void Objecte::aplicaTGCentrat(mat4 m) {
@@ -211,16 +223,28 @@ void Objecte::make()
         for(unsigned int j=0; j<cares[i].idxVertices.size(); j++)
         {
             points[Index] = vertexs[cares[i].idxVertices[j]];
+            pointsTmp[Index] = vertexs[cares[i].idxVertices[j]];
             colors[Index] = base_colors[i%4];
             Index++;
         }
     }
     // S'ha de dimensionar uniformement l'objecte a la capsa de l'escena i s'ha posicionar en el lloc corresponent
-
 }
 
 float Objecte::getYOrig() {
     return this->yorig;
+}
+
+bool Objecte::isCollision(Objecte * obj){
+
+    Capsa3D c1 = obj->calculCapsa3D();
+    Capsa3D c2 = this->calculCapsa3D();
+    return (c1.pmax.x > c2.pmin.x &&
+            c1.pmin.x < c2.pmax.x &&
+            c1.pmax.y > c2.pmin.y &&
+            c1.pmin.y < c2.pmax.y &&
+            c1.pmax.z > c2.pmin.z &&
+            c1.pmin.z < c2.pmax.z );
 }
 
 

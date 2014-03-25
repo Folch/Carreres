@@ -41,24 +41,28 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
 
             if (comment_ptr == (char *) -1) {
                 /* end-of-file */
-                if(!strcmp (objType, "Roda_Esquerra_Posterior_Untitled")) {
-                    currentObj = new Roda(vertexsTmp, caresTmp);
-                    ((Roda*)currentObj)->type = ESQUERRA_POSTERIOR;
-                }else if(!strcmp (objType, "Roda_Dreta_Posterior_04")){
-                    currentObj = new Roda(vertexsTmp, caresTmp);
-                    ((Roda*)currentObj)->type = DRETA_POSTERIOR;
-                }else if(!strcmp (objType, "Roda_Esquerra_Davantera_02")){
-                    currentObj = new Roda(vertexsTmp, caresTmp);
-                    ((Roda*)currentObj)->type = ESQUERRA_DAVANTERA;
-                }else if(!strcmp (objType, "Roda_Dreta_Davantera_03")){
-                    currentObj = new Roda(vertexsTmp, caresTmp);
-                    ((Roda*)currentObj)->type = DRETA_DAVANTERA;
-                }else if(!strcmp (objType, "Carrosseria_00")){
-                    currentObj = new Carrosseria(vertexsTmp, caresTmp);
-                }else{
-                    break;
+                if(dynamic_cast<Cotxe*>(obj)){
+                    if(!strcmp (objType, "Roda_Esquerra_Posterior_Untitled")) {
+                        currentObj = new Roda(vertexsTmp, caresTmp);
+                        ((Roda*)currentObj)->type = ESQUERRA_POSTERIOR;
+                    }else if(!strcmp (objType, "Roda_Dreta_Posterior_04")){
+                        currentObj = new Roda(vertexsTmp, caresTmp);
+                        ((Roda*)currentObj)->type = DRETA_POSTERIOR;
+                    }else if(!strcmp (objType, "Roda_Esquerra_Davantera_02")){
+                        currentObj = new Roda(vertexsTmp, caresTmp);
+                        ((Roda*)currentObj)->type = ESQUERRA_DAVANTERA;
+                    }else if(!strcmp (objType, "Roda_Dreta_Davantera_03")){
+                        currentObj = new Roda(vertexsTmp, caresTmp);
+                        ((Roda*)currentObj)->type = DRETA_DAVANTERA;
+                    }else if(!strcmp (objType, "Carrosseria_00")){
+                        currentObj = new Carrosseria(vertexsTmp, caresTmp);
+                    }else{
+                        break;
+                    }
+                    ((Cotxe*)obj)->addComponent(currentObj);
+                }else if(dynamic_cast<Obstacle*>(obj)) {
+                    obj = new Obstacle(vertexsTmp, caresTmp);
                 }
-                ((Cotxe*)obj)->addComponent(currentObj);
                 break;
             }
 

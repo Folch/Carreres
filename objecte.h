@@ -8,7 +8,6 @@
 #include <Common.h>
 #include <cara.h>
 #include <limits>
-#include <math.h>
 
 #include <QGLShaderProgram>
 
@@ -22,9 +21,7 @@ class Objecte : public QObject
     Q_OBJECT
 protected:
 
-
     // Sistema de coordenades d'un objecte: punt origen i eixos de rotació
-    GLfloat xorig, yorig, zorig;
     float xRot;
     float yRot;
     float zRot;
@@ -40,12 +37,14 @@ protected:
     // Estructures de vertexs i colors per passar a la GPU
     int     numPoints;
     point4 *points;
+    point4 *pointsTmp;
     color4 *colors;
     int Index; // index de control del numero de vertexs a posar a la GPU
 
 
 public:
 
+    GLfloat xorig, yorig, zorig;
     vector<Cara> cares; // cares de l'objecte
     vector<point4> vertexs; // vertexs de l'objecte sense repetits
 
@@ -67,6 +66,8 @@ public:
     // Si l'objecte es construeix procedimentalment es sobrecarrega el make
     virtual void make();
 
+    virtual bool isCollision(Objecte*);
+
     // Pas generic de vertexs i colors a la GPU
     virtual void toGPU(QGLShaderProgram *p);
     // Pintat amb la GPU
@@ -75,6 +76,8 @@ public:
     // Calcula la capsa 3D contenidora de l'objecte
     virtual Capsa3D calculCapsa3D();
 
+    virtual void restorePoints();
+    virtual void backupPoints();
     // Aplica una TG qualsevol a un objecte
     virtual void aplicaTG(mat4 m);
     virtual void aplicaTGPoints(mat4 m);

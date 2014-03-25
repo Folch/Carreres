@@ -36,9 +36,11 @@ public:
 
     void draw();
     void CapsaMinCont3DEscena();
+    bool isCollision(Objecte*);
 
     // Capsa contenedora de l'escena
     Capsa3D capsaMinima;
+    mat4 scaleScene;
 
     // Objectes de l'escena: a modificar. Ara nomes té un objecte. Cal afegir un conjunt d'objectes
     vector<Objecte*> vObjectes;
