@@ -24,7 +24,6 @@ public:
     virtual void aplicaTGPoints(mat4);
     virtual void toGPU(QGLShaderProgram*);
     virtual bool isCollision(Objecte *);
-    void aplicaTGRodes(mat4);
 
     void forward();
     void backward();

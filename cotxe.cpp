@@ -60,7 +60,7 @@ void Cotxe::make() {
     //translate (xorig,yorig,zorig)
 
     GLfloat scale = tam/capsa.max_size;
-    mat4 m = Translate(xorig, scale*capsa.h/2.0, zorig)*RotateY(rotateCotxe)*Scale(scale,scale,scale)*Translate(-capsa.pmig.x, -capsa.pmig.y, -capsa.pmig.z);
+    mat4 m = Translate(xorig, scale*capsa.h/2.0, zorig)*RotateY(rotateCotxe)*Scale(scale,scale,scale)*Translate(-capsa.pmig);
     this->aplicaTG(m);
 }
 
@@ -117,10 +117,6 @@ void Cotxe::backupPoints() {
     }
     if(carrosseria != NULL)
         carrosseria->backupPoints();
-}
-
-void Cotxe::aplicaTGRodes(mat4 m) {
-
 }
 
 void Cotxe::aplicaTG(mat4 m) {
@@ -180,7 +176,7 @@ void Cotxe::forward(){
     // Metode a implementar per fer el moviment del cotxe
 
     double vel = -0.06;
-    aplicaTG(Translate(vel*cos(rotateCotxe*M_PI/180.0),0,0)*Translate(0,0,-vel*sin(rotateCotxe*M_PI/180.0)));
+    aplicaTG(Translate(vel*cos(rotateCotxe*M_PI/180.0),0,-vel*sin(rotateCotxe*M_PI/180.0)));
 
     if(rotateRodes != 0) {
         float rot = rotateRodes > 0? 5:-5;
@@ -203,8 +199,8 @@ void Cotxe::forward(){
 void Cotxe::backward(){
     // Metode a implementar per fer el moviment del cotxe
 
-    double vel = 0.03;
-    aplicaTG(Translate(vel*cos(rotateCotxe*M_PI/180.0),0,0)*Translate(0,0,-vel*sin(rotateCotxe*M_PI/180.0)));
+    double vel = 0.06;
+    aplicaTG(Translate(vel*cos(rotateCotxe*M_PI/180.0),0,-vel*sin(rotateCotxe*M_PI/180.0)));
 
     if(rotateRodes != 0) {
         float rot = rotateRodes > 0? -5:5;
