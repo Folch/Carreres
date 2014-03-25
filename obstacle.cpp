@@ -28,6 +28,10 @@ Obstacle::Obstacle(vector<point4> vertexs, vector<Cara> cares) : Objecte(vertexs
 }
 
 void Obstacle::make() {
+    cares.clear();
+    vertexs.clear();
+
+    Index = 0;
     quad(0,1,2,3);
     quad(4,5,6,7);
     quad(0,4,7,3);

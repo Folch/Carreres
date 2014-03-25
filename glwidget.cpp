@@ -211,6 +211,16 @@ void GLWidget::resetView()
 
     // Metode a modificar per a adaptar tots els objectes de l'escena.
 
+    for (int i = 0; i < esc->vObjectes.size(); ++i) {
+        adaptaObjecteTamanyWidget(esc->vObjectes[i]);
+        esc->vObjectes[i]->backupPoints();
+    }
+    if(esc->terra != NULL) {
+        adaptaObjecteTamanyWidget(esc->terra);
+        esc->terra->backupPoints();
+    }
+
+
     updateGL();
 }
 

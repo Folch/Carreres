@@ -22,6 +22,7 @@ public:
     virtual void aplicaTG(mat4);
     virtual void aplicaTGCentrat(mat4);
     virtual void aplicaTGPoints(mat4);
+    void aplicaTGRodes(mat4);
     virtual void toGPU(QGLShaderProgram*);
     virtual bool isCollision(Objecte *);
 
@@ -29,7 +30,7 @@ public:
     void backward();
     void turnleft();
     void turnright();
-    vec3 direction; //direcció inicial
+    float xdirec, ydirec, zdirec;
     void addComponent(Objecte *obj);
 
 private:
