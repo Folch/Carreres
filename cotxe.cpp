@@ -220,24 +220,24 @@ void Cotxe::backward(){
 
 void Cotxe::turnleft(){
     // Metode a implementar per fer el moviment del cotxe
-    rotateRodes -= 5;
-    if(rotateRodes>=-45) {
-        rodes[0]->aplicaTGCentrat(RotateY(-5));
-        rodes[1]->aplicaTGCentrat(RotateY(-5));
+    rotateRodes += 5;
+    if(rotateRodes<=25) {
+        rodes[0]->aplicaTGCentrat(RotateY(5));
+        rodes[1]->aplicaTGCentrat(RotateY(5));
     }else{
-        rotateRodes = -45;
+        rotateRodes = 25;
     }
     rotateRodes = (int)rotateRodes%360;
 }
 
 void Cotxe::turnright(){
     // Metode a implementar per fer el moviment del cotxe
-    rotateRodes += 5;
-    if(rotateRodes<=45) {
-        rodes[0]->aplicaTGCentrat(RotateY(5));
-        rodes[1]->aplicaTGCentrat(RotateY(5));
+    rotateRodes -= 5;
+    if(rotateRodes>=-25) {
+        rodes[0]->aplicaTGCentrat(RotateY(-5));
+        rodes[1]->aplicaTGCentrat(RotateY(-5));
     }else{
-        rotateRodes = 45;
+        rotateRodes = -25;
     }
     rotateRodes = (int)rotateRodes%360;
 }

@@ -6,7 +6,7 @@ Terra::Terra() : Objecte(NumVerticesF) {
 }
 
 Terra::Terra(float x, float z, float y):Objecte(NumVerticesF) {
-    init(x, y, z);
+    init(x, 0, z);
 }
 
 void Terra::init(float x, float y, float z) {

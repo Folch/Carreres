@@ -42,6 +42,8 @@ protected:
     void setXRotation(int angle);
     void setYRotation(int angle);
     void setZRotation(int angle);
+    void Pan(int, int);
+    void Zoom(int);
 
 private:
     escena *esc;

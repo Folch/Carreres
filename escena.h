@@ -18,29 +18,38 @@
 #include <cotxe.h>
 #include <terra.h>
 #include <obstacle.h>
+#include <camera.h>
 
 using namespace std;
 
 class escena
 {
 public:
-    escena();
+    escena(Camera*);
     ~escena();
 
     void addObjecte(Objecte *obj);
     void addLand(Terra *t);
     void aplicaTG(mat4 m);
 
+    /*For Camera*/
+    void addCamera(Camera*);
+    void applyCamera(QString);
+    void actualitzaCameraPanoramica(bool);
+    void resetCameraPanoramica();
+    void actualitzaCameraThirdPerson();
+    void iniLookAtCotxe();
+
     void aplicaTGCentrat(mat4 m);
     void reset();
 
     void draw();
-    void CapsaMinCont3DEscena();
+    Capsa3D CapsaMinCont3DEscena();
     bool isCollision(Objecte*);
 
-    // Capsa contenedora de l'escena
-    Capsa3D capsaMinima;
-    mat4 scaleScene;
+    //Camares de la escena
+    Camera *camera; //Camera actual
+    QHash<QString, Camera*> cameras; //Llista de cameras
 
     // Objectes de l'escena: a modificar. Ara nomes té un objecte. Cal afegir un conjunt d'objectes
     vector<Objecte*> vObjectes;
