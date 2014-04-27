@@ -185,7 +185,8 @@ bool Cotxe::isCollision(Objecte *obj) {
 void Cotxe::forward(){
     // Metode a implementar per fer el moviment del cotxe
 
-    double vel = -0.06;
+    Capsa3D c = calculCapsa3D();
+    double vel = -c.max_size*0.06;
     aplicaTG(Translate(vel*cos(rotateCotxe*M_PI/180.0),0,-vel*sin(rotateCotxe*M_PI/180.0)));
 
     if(rotateRodes != 0) {
@@ -203,7 +204,8 @@ void Cotxe::forward(){
 void Cotxe::backward(){
     // Metode a implementar per fer el moviment del cotxe
 
-    double vel = 0.06;
+    Capsa3D c = calculCapsa3D();
+    double vel = c.max_size*0.06;
     aplicaTG(Translate(vel*cos(rotateCotxe*M_PI/180.0),0,-vel*sin(rotateCotxe*M_PI/180.0)));
 
     if(rotateRodes != 0) {

@@ -47,11 +47,6 @@ protected:
 
 private:
     escena *esc;
-
-    int xRot;
-    int yRot;
-    int zRot;
-
     QPoint lastPos;
     QColor qtGreen;
     QColor qtPurple;

@@ -31,12 +31,12 @@ public:
     void turnleft();
     void turnright();
     float xdirec, ydirec, zdirec;
+    float rotateCotxe;
     void addComponent(Objecte *obj);
 
 private:
     Roda* rodes[4];
     Carrosseria *carrosseria;
-    float rotateCotxe;
     float rotateRodes;
 
 };

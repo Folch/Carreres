@@ -12,10 +12,6 @@ GLWidget::GLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent) {
     setFocusPolicy( Qt::StrongFocus );
 
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
-
     a = 50.0;
     h = 50.0;
     p = 50.0;
@@ -107,7 +103,9 @@ void GLWidget::newObjecte(Objecte * obj) {
     obj->backupPoints();
 
     esc->resetCameraPanoramica();
-
+    esc->camera->update();
+    if(esc->camera->name == "Tercera")
+        esc->actualitzaCameraThirdPerson();
 
     updateGL();
 }
@@ -119,20 +117,32 @@ void GLWidget::newObstacle(int nombre) {
 
     // Metode a implementar
 
+    if(esc->terra == NULL || esc->myCar == NULL) {
+        //mostrar un dialog d'error
+       QMessageBox::information(0, "Avis", "Has de crear abans el terra i el cotxe");
+       return;
+    }
+
+    Capsa3D capsa = esc->CapsaMinCont3DEscena();
+    GLfloat w = capsa.a;
+    GLfloat p = capsa.p;
+    GLfloat t;
+    if(w<p) t = w;
+    else t = p;
     Obstacle *o;
     srand(time(NULL));
     int i = 0;
     while(i<nombre) {
-        double x = rand()/(float)RAND_MAX * 4 - 2;
-        double z = rand()/(float)RAND_MAX * 4 - 2;
-        o = new Obstacle(x,0,z,0.1);
+        double x = rand()/(float)RAND_MAX * w - w/2;
+        double z = rand()/(float)RAND_MAX * p - w/2;
+        o = new Obstacle(x,0,z,t*0.1f);
         o->make();
         if(esc->isCollision(o)) {
             i--;
             delete o;
         }else {
             delete o;
-            o = new Obstacle(x,0,z,0.1);
+            o = new Obstacle(x,0,z,t*0.1f);
             newObjecte(o);
         }
         i++;
@@ -157,9 +167,9 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
     // Cal modificar-lo per a que es posicioni a la Y correcte
     float yorig = 0;
 
+    if(mida<10) mida = 10;
+
     ReadObject *r = new ReadObject();
-    vector<Cara> cares;
-    vector<point4> vertexs;
     //r.readObj(obj, &cares, &vertexs);
     obj = r->readCar(fichero, mida, xorig, yorig, zorig, 0.,0.,0., xdirec, ydirec, zdirec );
 
@@ -167,7 +177,7 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
     //obj = new Cotxe(vertexs, cares,mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
 
     newObjecte(obj);
-    esc->actualitzaCameraThirdPerson();
+    //esc->actualitzaCameraThirdPerson();
     updateGL();
 
     delete r;
@@ -185,10 +195,7 @@ void GLWidget::initializeGL() {
 }
 
 void GLWidget::resetView() {
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
-
+    esc->applyCamera("Paralela");
 
     esc->reset();
 
@@ -206,16 +213,6 @@ void GLWidget::resetView() {
 
 void GLWidget::paintGL() {
     glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
-
-    qNormalizeAngle(xRot);
-    qNormalizeAngle(yRot);
-    qNormalizeAngle(zRot);
-
-    mat4 transform = ( RotateX( xRot / 16.0 ) *
-                        RotateY( yRot / 16.0 ) *
-                        RotateZ( zRot / 16.0 ) );
-
-    esc->aplicaTG(transform);
     esc->draw();
 }
 
@@ -234,45 +231,26 @@ void GLWidget::resizeGL(int width, int height) {
 }
 
 
-void GLWidget::setXRotation(int angle) {
-    qNormalizeAngle(angle);
-    if (angle != xRot) {
-        xRot = angle;
-        updateGL();
-    }
-}
-
-void GLWidget::setYRotation(int angle) {
-    qNormalizeAngle(angle);
-    if (angle != yRot) {
-        yRot = angle;
-        updateGL();
-    }
-}
-
-void GLWidget::setZRotation(int angle) {
-    qNormalizeAngle(angle);
-    if (angle != zRot) {
-        zRot = angle;
-        updateGL();
-    }
-}
-
 void GLWidget::Zoom(int zoom) {
+    /*Si la cámara es la de tercera no permet fer zoom*/
+    if(esc->camera->name == "Tercera") return;
     if(zoom == 1)
         esc->camera->AmpliaWindow(0.05);
     else
         esc->camera->AmpliaWindow(-0.05);
-    esc->camera->CalculaMatriuProjection();
-    esc->actualitzaCameraPanoramica(true);
+
+    esc->actualitzaCameraPanoramica(false);
 
     updateGL();
 }
 
 void GLWidget::Pan(int dx, int dy) {
-    esc->camera->wd.pmin[0] -= 0.005f*dx;
-    esc->camera->wd.pmin[1] += 0.005f*dy;
-    esc->camera->CalculaMatriuProjection();
+    /*Si la cámara es la de tercera no permet fer panning*/
+    if(esc->camera->name == "Tercera") return;
+    Capsa3D c = esc->CapsaMinCont3DEscena();
+    GLfloat factor = c.max_size*0.005f;
+    esc->camera->wd.pmin[0] -= factor*dx;
+    esc->camera->wd.pmin[1] += factor*dy;
     esc->actualitzaCameraPanoramica(false);
 
     updateGL();
@@ -288,12 +266,14 @@ void GLWidget::mouseMoveEvent(QMouseEvent *event) {
     int dy = event->y() - lastPos.y();
 
     if (event->buttons() & Qt::LeftButton) {
+        /*Si la cámara es la de tercera no permet rotarla*/
+        if(esc->camera->name == "Tercera") return;
         if(lastPos.y() != event->y() && lastPos.x() != event->x()) {
-            esc->camera->setRotation(dx, dy);
+            esc->camera->setRotation(dy, dx);
         }else if(lastPos.y() != event->y()) {
-            esc->camera->setRotation(dx, 0);
+            esc->camera->setRotation(dy, 0);
         } else if(lastPos.x() != event->x()) {
-           esc->camera->setRotation(0, dy);
+           esc->camera->setRotation(0, dx);
         }
         updateGL();
     } else if (event->buttons() & Qt::RightButton) {
@@ -343,28 +323,11 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             updateGL();
             break;
         case Qt::Key_Escape:
+            if(esc->myCar == NULL) return;
             if (!esc->cameras.contains("Tercera")) {
                 Camera *c = new Camera("Tercera", program, this->size().width(), this->height());
-                /*set params of camera*/
-                Capsa3D capsa = esc->myCar->calculCapsa3D();
-                c->piram.proj = PERSPECTIVA;
-                c->piram.d = capsa.max_size*2;
-                c->setVRP(capsa);
-                c->vs.angx = -30;
-                c->vs.angy = 90;
-                c->setOBS(capsa);
-                //c->AmpliaWindow(-0.1f);
-                //c->CalculaMatriuProjection();
-
-
-                //c->vs.obs = c->CalculObs(c->vs.vrp, c->piram.d, c->vs.angx, c->vs.angy);
-                //c->CalculaMatriuModelView();
-                //c->CalculWindow(capsa);
-
-
-
-                /*add camera on scene*/
                 esc->addCamera(c);
+                esc->iniLookAtCotxe();
             }
 
             QString name;
@@ -373,6 +336,8 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             else
                 name = "Tercera";
             esc->applyCamera(name);
+            if(name == "Tercera")
+                esc->actualitzaCameraThirdPerson();
             updateGL();
             break;
     }

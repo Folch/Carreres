@@ -28,12 +28,15 @@ void Camera::setVRP(Capsa3D capsa) {
     vs.vrp[1] = capsa.pmig.y;
     vs.vrp[2] = capsa.pmig.z;
 
+
+    //piram.dant = 1;
+    //piram.dpost = 10;
     CalculaMatriuModelView();
 }
 
 void Camera::setRotation(int dx, int dy) {
-    vs.angx += dy;
-    vs.angy += dx;
+    vs.angx -= dx;
+    vs.angy -= dy;
 
     /*Tornem a calcular l'observador*/
     vs.obs = CalculObs(vs.vrp, piram.d, vs.angx, vs.angy);
@@ -44,12 +47,7 @@ void Camera::setRotation(int dx, int dy) {
 /*Aquesta capsa ha de ser la capsa 3D de l'escena*/
 void Camera::setOBS(Capsa3D capsa) {
 
-    //calculem la diagonal
-    piram.d = sqrt(capsa.a*capsa.a+capsa.h*capsa.h+capsa.p*capsa.p);
     vs.obs = CalculObs(vs.vrp,piram.d,vs.angx,vs.angy);
-
-    piram.dant = 1;
-    piram.dpost = 1000;//piram.dant+capsa.max_size;
 
     CalculaMatriuModelView();
     CalculWindow(capsa);
@@ -86,9 +84,14 @@ void Camera::CalculaMatriuProjection() {
         //Preguntar
         //proj = Ortho(wd.pmin[0], wd.pmin[0]+wd.a, wd.pmin[1], wd.pmin[1]+wd.h, piram.dant, piram.dpost);
         proj = Ortho(wd.pmin[0], wd.pmin[0]+wd.a, wd.pmin[1], wd.pmin[1]+wd.h, piram.dant, piram.dpost);
+        //proj = Ortho(-wd.a, wd.a, -wd.h, wd.h, 1, 1000);
+        //proj = Ortho(-2, 2, -2, 2, 1, 1000);
         //proj = Ortho(wd.pmin[0]+wd.a, wd.pmin[0],wd.pmin[1],wd.pmin[1]+wd.h,piram.dant,piram.dpost);
     }else{
-        proj = Perspective(vs.angy, wd.a/wd.h, piram.dant, piram.dpost);
+        proj = Frustum(wd.pmin[0], wd.pmin[0]+wd.a, wd.pmin[1], wd.pmin[1]+wd.h, piram.dant, piram.dpost);
+        //proj = Frustum(wd.a, -wd.a, wd.h, -wd.h, piram.dant, piram.dpost);
+        //proj = Frustum(-wd.a, wd.a, -wd.h, wd.h, 1, 1000);
+        //proj = Perspective(vs.angy, wd.a/wd.h, piram.dant, piram.dpost);
         //proj = identity();
     }
 }
@@ -210,7 +213,7 @@ void Camera::CalculWindow( Capsa3D c)
      * vup: el ángulo en el que mira la cámara
      */
 
-    //CalculaMatriuModelView();
+    CalculaMatriuModelView();
 
     if (piram.proj==PERSPECTIVA) {
         CreaMatDp(MDP);
@@ -302,8 +305,7 @@ Capsa2D  Camera::CapsaMinCont2DXYVert( vec4 *v, int nv)
     c.h = pmax[1]-pmin[1]+1;
     c.pmin[0] = -c.a/2.0;
     c.pmin[1] = -c.h/2.0;
-    //c.pmin[0] = pmin[0];
-    //c.pmin[1] = pmin[1];
+
     return c;
 }
 

@@ -6,7 +6,7 @@ escena::escena(Camera *c) {
     camera = c;
     cameras[c->name] = c;
 
-
+    myCar = NULL;
     terra = NULL;
 }
 
@@ -37,36 +37,53 @@ void escena::applyCamera(QString name) {
 }
 
 void escena::actualitzaCameraPanoramica(bool clip) {
+    if(clip) {
+        camera->CalculWindowAmbRetallat();
+    }
+    camera->CalculaMatriuProjection();
     camera->update();
 }
 
 void escena::resetCameraPanoramica() {
+    Camera *c = cameras["Paralela"];
     Capsa3D capsa = CapsaMinCont3DEscena();
-    camera->piram.proj = PARALLELA;
+    c->piram.proj = PARALLELA;
 
-    /*esc->camera->vs.angx = 45;
-    esc->camera->vs.angy = 45;
-    esc->camera->setVRP(obj->calculCapsa3D());
-    esc->camera->piram.d = 2;
-    esc->camera->vs.obs = esc->camera->CalculObs(esc->camera->vs.vrp,esc->camera->piram.d,esc->camera->vs.angx,esc->camera->vs.angy);
-    esc->camera->CalculaMatriuModelView();
-    esc->camera->CalculWindow(capsa);*/
-
-    camera->vs.angx = -90;
-    camera->vs.angy = 0;
-    camera->setVRP(capsa);
-    camera->setOBS(capsa);
-    //esc->camera->ini(this->size().width(), this->size().height(), esc->capsaMinima);
-    actualitzaCameraPanoramica(false);
+    c->piram.d = sqrt(capsa.a*capsa.a+capsa.h*capsa.h+capsa.p*capsa.p);
+    c->piram.dant = capsa.max_size*0.4f;
+    c->piram.dpost = c->piram.d+capsa.max_size/2.0;//piram.dant+capsa.max_size;
+    c->vs.angx = -90;
+    c->vs.angy = 0;
+    c->setVRP(capsa);
+    c->setOBS(capsa);
 }
 
 void escena::actualitzaCameraThirdPerson() {
     if(myCar == NULL) return;
+    /*Si la camara no es en tercera persona, no ha de seguir al cotxe*/
+    if(camera->name != "Tercera") return;
+    Capsa3D capsa = myCar->calculCapsa3D();
+    camera->vs.angy = myCar->rotateCotxe+90;
+    camera->setVRP(capsa);
+    camera->setOBS(capsa);
+    camera->update();
 
 }
 
 void escena::iniLookAtCotxe() {
-
+    Camera *c = cameras["Tercera"];
+    /*set params of camera*/
+    Capsa3D capsa = myCar->calculCapsa3D();
+    c->piram.proj = PERSPECTIVA;
+    c->piram.d = capsa.max_size;
+    c->piram.dant = capsa.max_size*0.4f;
+    c->piram.dpost = c->piram.d+capsa.max_size/2.0;//piram.dant+capsa.max_size;
+    c->vs.angx = -40;
+    c->vs.angy = myCar->rotateCotxe+90;
+    c->setVRP(capsa);
+    c->setOBS(capsa);
+    //c->AmpliaWindow(70);
+    //c->CalculaMatriuProjection();
 }
 
 void escena::addLand(Terra *t) {
@@ -93,8 +110,13 @@ Capsa3D escena::CapsaMinCont3DEscena() {
 
     point4 *points = new point4[2];
     //vec3(a,h,p)
-    for (int j = 0; j < vObjectes.size(); j++) {
-        Capsa3D c = vObjectes[j]->calculCapsa3D();
+    int mes_u = (terra!=NULL) ? 1:0;
+    for (int j = 0; j < vObjectes.size()+mes_u; j++) {
+        Capsa3D c;
+        if(j != vObjectes.size())
+            c = vObjectes[j]->calculCapsa3D();
+        else
+            c = terra->calculCapsa3D();
         points[0] = c.pmin;
         points[1] = c.pmax;
         for (int i = 0; i < 2; i++) {
@@ -151,6 +173,8 @@ void escena::draw() {
 }
 
 void escena::reset() {
+    resetCameraPanoramica();
+    camera->update();
     for(unsigned int i=0; i<vObjectes.size(); i++) {
         vObjectes[i]->make();
     }
