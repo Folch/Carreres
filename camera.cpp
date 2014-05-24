@@ -1,10 +1,9 @@
 #include "camera.h"
 
-Camera::Camera(QString name, QGLShaderProgram *program, int width, int height) {
+Camera::Camera(QString name, int width, int height) {
     this->name = name;
-    this->program = program;
 
-    this->toGPU();
+    //this->toGPU();
 
     vs.vrp = vec4(0.0, 0.0, 0.0, 1.0);
     vs.obs = vec4(0.0, 0.0, 200.0, 1.0);
@@ -41,7 +40,6 @@ void Camera::setRotation(int dx, int dy) {
     /*Tornem a calcular l'observador*/
     vs.obs = CalculObs(vs.vrp, piram.d, vs.angx, vs.angy);
     CalculaMatriuModelView();
-    update();
 }
 
 /*Aquesta capsa ha de ser la capsa 3D de l'escena*/
@@ -54,15 +52,9 @@ void Camera::setOBS(Capsa3D capsa) {
     CalculaMatriuProjection();
 }
 
-void Camera::update() {
-    //CalculaMatriuModelView();
-    //CalculaMatriuProjection();
-    toGPU();
-}
-
-void Camera::toGPU() {
-    setModelView(modView);
-    setProjection(proj);
+void Camera::toGPU(QGLShaderProgram* program) {
+    setModelView(modView, program);
+    setProjection(proj, program);
 }
 
 
@@ -103,13 +95,12 @@ void Camera::setViewport(int x, int y, int a, int h) {
     vp.h = h;
 }
 
-void Camera::setModelView(mat4 m) {
+void Camera::setModelView(mat4 m, QGLShaderProgram* program) {
     model_view = program->uniformLocation("model_view"); //Atribut del glsl
     glUniformMatrix4fv(model_view, 1, GL_TRUE, m);
-
 }
 
-void Camera::setProjection(mat4 p) {
+void Camera::setProjection(mat4 p, QGLShaderProgram* program) {
     projection = program->uniformLocation("projection");
     glUniformMatrix4fv(projection, 1, GL_TRUE, p);
 }

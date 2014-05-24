@@ -21,15 +21,24 @@ Obstacle::Obstacle(double xorig,double yorig, double zorig, double costat) : Obj
     tam = costat;
 
     mode = GL_TRIANGLES;
+
+
+    m = new Material();
+
+    m->ka = vec3(0.0f);
+    m->kd = vec3(0.5f, 0.5f, 0.0f);
+    m->ks = vec3(0.6f, 0.6f, 0.5f);
+
+
+    m->shineness = 0.25f*128;
 }
 
-Obstacle::Obstacle(vector<point4> vertexs, vector<Cara> cares) : Objecte(vertexs,cares){
+Obstacle::Obstacle(vector<point4> vertexs, vector<Cara*> cares) : Objecte(vertexs,cares){
     mode = GL_TRIANGLES;
 }
 
 void Obstacle::make() {
     cares.clear();
-    vertexs.clear();
 
     Index = 0;
     quad(0,1,2,3);
@@ -54,6 +63,6 @@ void Obstacle::make() {
 
 
 void Obstacle::quad(int a, int b, int c, int d) {
-    cares.push_back(Cara(a,b,c));
-    cares.push_back(Cara(a,c,d));
+    cares.push_back(new Cara(a,b,c));
+    cares.push_back(new Cara(a,c,d));
 }

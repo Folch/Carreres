@@ -6,14 +6,14 @@
  *
  */
 
-Objecte::Objecte(vector<point4> vertexs, vector<Cara> cares, GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) : numPoints(3*cares.size()){
+Objecte::Objecte(vector<point4> vertexs, vector<Cara*> cares, GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,double xrot, double yrot, double zrot) : numPoints(3*cares.size()){
     this->cares = cares;
     this->vertexs = vertexs;
     init(mida, xorig, yorig, zorig, xrot, yrot, zrot);
 
 }
 
-Objecte::Objecte(vector<point4> vertexs, vector<Cara> cares) : numPoints(3*cares.size()){
+Objecte::Objecte(vector<point4> vertexs, vector<Cara*> cares) : numPoints(3*cares.size()){
     this->cares = cares;
     this->vertexs = vertexs;
     init(1,0,0,0,0,0,0);
@@ -39,7 +39,7 @@ void Objecte::init(GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,doubl
 
     points = new point4[numPoints];
     pointsTmp = new point4[numPoints];
-    colors = new color4[numPoints];
+    normals = new point4[numPoints];
     Index = 0;
     this->tam = mida;
     this->xorig = xorig;
@@ -61,8 +61,8 @@ Objecte::~Objecte()
 {
     if(points!=NULL)
         delete points;
-    if(colors!=NULL)
-        delete colors;
+    if(normals!=NULL)
+        delete normals;
 }
 
 /*
@@ -168,35 +168,37 @@ void Objecte::toGPU(QGLShaderProgram *pr) {
 
     glGenBuffers( 1, &buffer );
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
-    glBufferData( GL_ARRAY_BUFFER, sizeof(point4) * Index + sizeof(color4) * Index,
+    glBufferData( GL_ARRAY_BUFFER, sizeof(point4) * Index + sizeof(point4) * Index,
                   NULL, GL_STATIC_DRAW );
     program->link();
 
-    program->bind();
+    //program->bind();
     glEnable( GL_DEPTH_TEST );
 }
 
 // Pintat en la GPU.
-void Objecte::draw()
-{
+void Objecte::draw() {
+
+    m->toGPU(program);
 
     // cal activar el buffer de l'objecte. Potser que ja n'hi hagi un altre actiu
     glBindBuffer( GL_ARRAY_BUFFER, buffer );
 
     // per si han canviat les coordenades dels punts
     glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof(point4) * Index, &points[0] );
-    glBufferSubData( GL_ARRAY_BUFFER, sizeof(point4) * Index, sizeof(color4) * Index, &colors[0] );
+    glBufferSubData( GL_ARRAY_BUFFER, sizeof(point4) * Index, sizeof(point4) * Index, &normals[0] );
+
+
 
     // Per a conservar el buffer
     int vertexLocation = program->attributeLocation("vPosition");
-    int colorLocation = program->attributeLocation("vColor");
+    int normalLocation = program->attributeLocation("vNormal");
 
     program->enableAttributeArray(vertexLocation);
     program->setAttributeBuffer("vPosition", GL_FLOAT, 0, 4);
 
-    program->enableAttributeArray(colorLocation);
-    program->setAttributeBuffer("vColor", GL_FLOAT, sizeof(point4) * Index, 4);
-
+    program->enableAttributeArray(normalLocation);
+    program->setAttributeBuffer("vNormal", GL_FLOAT, sizeof(point4) * Index, 4);
 
     //glPolygonMode(GL_FRONT_AND_BACK, GL_FA);
     glDrawArrays(mode, 0, Index );
@@ -204,31 +206,60 @@ void Objecte::draw()
     // Abans nomes es feia: glDrawArrays( GL_TRIANGLES, 0, NumVerticesP );
 }
 
-void Objecte::make()
-{
-
-    static vec3  base_colors[] = {
-        vec3( 1.0, 0.0, 0.0 ),
-        vec3( 0.0, 1.0, 0.0 ),
-        vec3( 0.0, 0.0, 1.0 ),
-        vec3( 1.0, 1.0, 0.0 )
-    };
-    // Recorregut de totes les cares per a posar-les en les estructures de la GPU
-    // Cal recorrer l'estructura de l'objecte per a pintar les seves cares
-
+void Objecte::make() {
+    bindCares();
+    recalculaNormals();
     Index = 0;
-
-    for(unsigned int i=0; i<cares.size(); i++)
-    {
-        for(unsigned int j=0; j<cares[i].idxVertices.size(); j++)
-        {
-            points[Index] = vertexs[cares[i].idxVertices[j]];
-            pointsTmp[Index] = vertexs[cares[i].idxVertices[j]];
-            colors[Index] = base_colors[i%4];
+    vec4 vector;
+    int idx;
+    for(unsigned int i=0; i<cares.size(); i++) {
+        for(unsigned int j=0; j<cares[i]->idxVertices.size(); j++) {
+            idx = cares[i]->idxVertices[j];
+            points[Index] = vertexs[idx];
+            pointsTmp[Index] = vertexs[idx];
+            vector = getNormalGourond(caresHash[idx]);
+            normals[Index].x = vector.x;
+            normals[Index].y = vector.y;
+            normals[Index].z = vector.z;
             Index++;
         }
     }
-    // S'ha de dimensionar uniformement l'objecte a la capsa de l'escena i s'ha posicionar en el lloc corresponent
+    //normalsFlatShading();
+}
+
+void Objecte::recalculaNormals() {
+    for (int i = 0; i < cares.size(); i++) {
+        cares[i]->calculaNormal(vertexs);
+    }
+}
+
+void Objecte::bindCares() {
+    for (int i = 0; i < vertexs.size(); i++) {
+        for (int j = 0; j < cares.size(); j++) {
+            if(cares[j]->vertex(i))
+                caresHash[i].push_back(cares[j]);
+        }
+    }
+}
+
+/*Aquí tinc una llista de cares, i he de retornar la normal d'una d'elles*/
+vec4 Objecte::getNormalFlatShading(vector<Cara*> cares) {
+    return cares[0]->normal;
+}
+
+/*Aquí tinc una llista de cares, i he de retornar la normal d'una d'elles*/
+vec4 Objecte::getNormalGourond(vector<Cara*> cares) {
+    vec4 vector(0,0,0);
+    vec4 tmp;
+    for (int i = 0; i < cares.size(); ++i) {
+        //vector += cares[i].calculaNormal(v);
+        tmp = cares[i]->normal;
+        vector.x += tmp.x;
+        vector.y += tmp.y;
+        vector.z += tmp.z;
+    }
+    vector /= cares.size();
+    return vector;
 }
 
 float Objecte::getYOrig() {

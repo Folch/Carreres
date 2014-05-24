@@ -12,7 +12,7 @@ using namespace std;
 class Cotxe: public Objecte
 {
 public:
-    Cotxe(vector<point4> vertexs, vector<Cara> cares, GLfloat, GLfloat,GLfloat,GLfloat,double, double, double, float,float,float);
+    Cotxe(vector<point4> vertexs, vector<Cara*> cares, GLfloat, GLfloat,GLfloat,GLfloat,double, double, double, float,float,float);
 
     virtual void make();
     virtual void draw();

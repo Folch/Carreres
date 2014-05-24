@@ -10,7 +10,7 @@ Cotxe* ReadObject::readCar(QString fichero, GLfloat mida, GLfloat xorig, GLfloat
                            double xrot, double yrot, double zrot,
                            float xdirec, float ydirec, float zdirec) {
 
-    vector<Cara> cares;
+    vector<Cara*> cares;
     vector<point4> vertexs;
     Cotxe* cotxe = new Cotxe(vertexs, cares,mida, xorig, yorig, zorig, xrot, yrot, zrot,xdirec, ydirec, zdirec);
 
@@ -18,12 +18,15 @@ Cotxe* ReadObject::readCar(QString fichero, GLfloat mida, GLfloat xorig, GLfloat
     return cotxe;
 }
 
+QHash<QString,QString> ReadObject::readmtl(QString filename) {
+
+}
 
 void ReadObject::readObj(QString filename, Objecte *obj) {
 
     FILE *fp = fopen(filename.toLocal8Bit(),"rb");
     Objecte *currentObj = NULL;
-    vector<Cara> caresTmp;
+    vector<Cara*> caresTmp;
     vector<point4> vertexsTmp;
     char objType[25];
     if (!fp)
@@ -168,8 +171,8 @@ void ReadObject::readObj(QString filename, Objecte *obj) {
 }
 
 
-void ReadObject::buildFace ( char **words, int nwords, vector<Cara> *cares, vector<point4> *vertexs, int vindexUlt) {
-    Cara face;
+void ReadObject::buildFace ( char **words, int nwords, vector<Cara*> *cares, vector<point4> *vertexs, int vindexUlt) {
+    Cara *face = new Cara();
     for (int i = 0; i < nwords; i++)
     {
         int vindex;
@@ -187,9 +190,9 @@ void ReadObject::buildFace ( char **words, int nwords, vector<Cara> *cares, vect
             /* store the vertex index */
 
             if (vindex > 0)       /* indices are from one, not zero */
-                face.idxVertices.push_back(vindex - 1 - vindexUlt);
+                face->idxVertices.push_back(vindex - 1 - vindexUlt);
             else if (vindex < 0)  /* negative indices mean count backwards */
-                face.idxVertices.push_back(vertexs->size() + vindex - vindexUlt);
+                face->idxVertices.push_back(vertexs->size() + vindex - vindexUlt);
             else
             {
                 fprintf (stderr, "Zero indices not allowed");//: '%s'\n", str_orig);
@@ -197,6 +200,5 @@ void ReadObject::buildFace ( char **words, int nwords, vector<Cara> *cares, vect
             }
         }
     }
-    face.color = vec4(1.0, 0.0, 0.0, 1.0);
     cares->push_back(face);
 }

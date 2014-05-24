@@ -1,11 +1,13 @@
 #include "cotxe.h"
 
-Cotxe::Cotxe(vector<point4> vertexs, vector<Cara> cares, GLfloat mida, GLfloat xorig, GLfloat yorig, GLfloat zorig,
+Cotxe::Cotxe(vector<point4> vertexs, vector<Cara*> cares, GLfloat mida, GLfloat xorig, GLfloat yorig, GLfloat zorig,
              double xrot, double yrot, double zrot,
              float xdirec, float ydirec, float zdirec) : Objecte(vertexs, cares, mida, xorig, yorig, zorig, xrot, yrot, zrot) {
     this->xdirec = xdirec;
     this->ydirec = 0;
     this->zdirec = zdirec;
+
+    this->mode = GL_TRIANGLES;
 }
 
 Capsa3D Cotxe::calculCapsa3D(){
@@ -81,6 +83,7 @@ void Cotxe::addComponent(Objecte *obj) {
      *
      *
      */
+    obj->mode = this->mode = GL_TRIANGLES;
     if(dynamic_cast<Roda*>(obj)){
         if(((Roda*)obj)->type == ESQUERRA_POSTERIOR){
             rodes[2] = (Roda*)obj;
@@ -96,6 +99,7 @@ void Cotxe::addComponent(Objecte *obj) {
 }
 
 void Cotxe::toGPU(QGLShaderProgram *p) {
+    program = p;
     for (int i = 0; i < 4; i++) {
         rodes[i]->toGPU(p);
     }

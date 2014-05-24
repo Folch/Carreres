@@ -19,6 +19,7 @@
 #include <terra.h>
 #include <obstacle.h>
 #include <camera.h>
+#include "conjuntllums.h"
 
 using namespace std;
 
@@ -50,6 +51,7 @@ public:
     //Camares de la escena
     Camera *camera; //Camera actual
     QHash<QString, Camera*> cameras; //Llista de cameras
+    ConjuntLlums *llums;
 
     // Objectes de l'escena: a modificar. Ara nomes té un objecte. Cal afegir un conjunt d'objectes
     vector<Objecte*> vObjectes;

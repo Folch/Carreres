@@ -1,10 +1,12 @@
 #ifndef _CARA_H_
 #define _CARA_H_
 
+#include<QHash>
 #include <vector>
 #include <Common.h>
 
 using namespace std;
+typedef Common::vec4  point4;
 
 typedef vec4 Vertices;
 // Face - representa una cara d'un objecte 3D
@@ -22,7 +24,8 @@ class Cara
 
 
     vec3 normal;
-    void calculaNormal(vector<Vertices> &);
+    void calculaNormal(vector<point4>);
+    bool vertex(int idx);
 };
 
 

@@ -1,11 +1,17 @@
 /***************************************************/
 /*           Definicio de la camera                */
 /***************************************************/
+
 #ifndef CAMERA_INCLOS
 #define CAMERA_INCLOS
 #include <stdio.h>
+
 #include <Common.h>
+#include <list>
+#include <vector>
 #include <QGLShaderProgram>
+
+using namespace std;
 
 #define PI 3.14159
 
@@ -47,12 +53,11 @@ typedef struct
 class Camera
 {
 public:
-     Camera(QString name, QGLShaderProgram *program, int, int);
+    Camera(QString name, int, int);
     ~Camera() {}
 
     /*Método que envía la cámara a la GPU*/
-    void update();
-    void toGPU();
+    void toGPU(QGLShaderProgram*);
 
     void setVRP(Capsa3D);
     void setOBS(Capsa3D);
@@ -78,15 +83,14 @@ public:
     Capsa2D  CapsaMinCont2DXYVert( vec4 *v, int nv);
 
     void setViewport(int x, int y, int a, int h);
-    void setModelView(mat4 m);
-    void setProjection(mat4 p);
+    void setModelView(mat4 m,QGLShaderProgram*);
+    void setProjection(mat4 p,QGLShaderProgram*);
 
     void rotate(Capsa3D c);
     void pan();
     void zoom();
 
     QString name;
-    QGLShaderProgram *program;
 
     VisuSystem vs;      /* Sistema de visualitzacio  */
     PiramProj piram;    /* Piramide de visualitzacio */

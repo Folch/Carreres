@@ -3,13 +3,14 @@
 
 #include <escena.h>
 #include <stdlib.h>
+#include "llum.h"
 
 #include <QtOpenGL>
 #include <QGLWidget>
 #include <QtGui>
 
 #define PROGRAM_VERTEX_ATTRIBUTE 0
-#define PROGRAM_COLOR_ATTRIBUTE 1
+#define PROGRAM_NORMAL_ATTRIBUTE 1
 
 class QGLShaderProgram;
 
@@ -54,11 +55,12 @@ private:
     float  a, p, h;
 
 // Programa de la GPU
-    QGLShaderProgram *program;
+    vector<QGLShaderProgram*> programs;
 
     //  Metode per a carregar de fitxers el vertex i el fragment shader
     void InitShader( const char* vertexShaderFile,
-                       const char* fragmentShaderFile );
+                       const char* fragmentShaderFile,
+                       QGLShaderProgram* program );
     // Metode per inicialitzar els shaders de l'aplicacio
     void initShadersGPU();
 

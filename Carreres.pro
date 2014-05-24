@@ -28,7 +28,10 @@ SOURCES += main.cpp\
     roda.cpp \
     carrosseria.cpp \
     obstacle.cpp \
-    camera.cpp
+    camera.cpp \
+    material.cpp \
+    llum.cpp \
+    conjuntllums.cpp
 
 HEADERS  += mainwindow.h \
     glwidget.h \
@@ -48,7 +51,10 @@ HEADERS  += mainwindow.h \
     roda.h \
     carrosseria.h \
     obstacle.h \
-    camera.h
+    camera.h \
+    material.h \
+    llum.h \
+    conjuntllums.h
 
 FORMS    += mainwindow.ui \
     newcotxedialog.ui \
@@ -56,7 +62,9 @@ FORMS    += mainwindow.ui \
     newobstacledialog.ui
 
 OTHER_FILES += \
-    vshader11.glsl \
-    fshader11.glsl \
-    vshader1.glsl \
-    fshader1.glsl
+    vshadercotxe.glsl \
+    fshadercotxe.glsl \
+    vshaderobstacle.glsl \
+    fshaderobstacle.glsl \
+    vshaderterra.glsl \
+    fshaderterra.glsl

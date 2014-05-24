@@ -5,7 +5,7 @@
 
 class Carrosseria : public Objecte {
     public:
-        Carrosseria(vector<point4>, vector<Cara>);
+        Carrosseria(vector<point4>, vector<Cara*>);
 };
 
 #endif // CARROSSERIA_H

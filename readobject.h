@@ -14,8 +14,9 @@ class ReadObject {
 
 
     private:
+        QHash<QString,QString> readmtl(QString filename);
         void readObj(QString, Objecte*);
-        void buildFace(char**, int, vector<Cara>*, vector<point4>*, int);
+        void buildFace(char**, int, vector<Cara*>*, vector<point4>*, int);
 };
 
 #endif // READOBJECT_H

@@ -18,8 +18,6 @@ GLWidget::GLWidget(QWidget *parent)
 
     qtGreen = QColor::fromCmykF(0.40, 0.0, 1.0, 0.0);
     qtPurple = QColor::fromCmykF(0.39, 0.39, 0.0, 0.0);
-
-    program = 0;
 }
 
 
@@ -28,7 +26,7 @@ GLWidget::~GLWidget() {
 }
 
 //  Metode per a carregar de fitxers el vertex i el fragment shader
-void GLWidget::InitShader(const char* vShaderFile, const char* fShaderFile) {
+void GLWidget::InitShader(const char* vShaderFile, const char* fShaderFile, QGLShaderProgram* program) {
 
     struct Shader {
         const char*  filename;
@@ -53,24 +51,80 @@ void GLWidget::InitShader(const char* vShaderFile, const char* fShaderFile) {
     }
     vshader->compileSourceCode(shaders[0].source);
     fshader->compileSourceCode(shaders[1].source);
-    program = new QGLShaderProgram(this);
+
     program->addShader(vshader);
     program->addShader(fshader);
 
     program->bindAttributeLocation("vPosition", PROGRAM_VERTEX_ATTRIBUTE);
-    program->bindAttributeLocation("vColor", PROGRAM_COLOR_ATTRIBUTE);
+    program->bindAttributeLocation("vNormal", PROGRAM_NORMAL_ATTRIBUTE);
     program->link();
 
-    program->bind();
 
-    esc = new escena(new Camera("Paralela", program, this->size().width(), this->size().height()));
-    //esc->camera->ini(this->size().width(), this->size().height(), esc->capsaMinima);
+
+    //program->bind();
 }
 
 // Metode per inicialitzar els shaders de l'aplicacio
 void GLWidget::initShadersGPU() {
-    // Carrega dels shaders i posa a punt per utilitzar els programes carregats a la GPU
-    InitShader( "../Carreres/vshader11.glsl", "../Carreres/fshader11.glsl" );
+
+    //programs:
+        // 0: programCotxe
+        // 1: programObstacle
+        // 2: programTerra
+
+    //Carrega dels shaders i posa a punt per utilitzar els programes carregats a la GPU
+    QGLShaderProgram* programCotxe = new QGLShaderProgram(this);
+    InitShader( "../Carreres/vshadercotxe.glsl", "../Carreres/fshadercotxe.glsl", programCotxe);
+    programs.push_back(programCotxe);
+
+
+    QGLShaderProgram* programObstacle = new QGLShaderProgram(this);
+    InitShader( "../Carreres/vshaderobstacle.glsl", "../Carreres/fshaderobstacle.glsl", programObstacle);
+    programs.push_back(programObstacle);
+
+
+    QGLShaderProgram* programTerra = new QGLShaderProgram(this);
+    InitShader( "../Carreres/vshaderterra.glsl", "../Carreres/fshaderterra.glsl", programTerra);
+    programs.push_back(programTerra);
+
+    esc = new escena(new Camera("Paralela", this->size().width(), this->size().height()));
+
+    esc->llums = new ConjuntLlums();
+    esc->llums->Ia = vec3(0.1f);
+    esc->llums->ka = vec3(0.1f);
+
+    Llum *l = new Llum("llum_puntual");
+    l->position = vec4(-50,50,0,0);
+    l->diffuse = vec3(0.9f);
+    l->ambient = vec3(0.0f);
+    l->specular = vec3(0.9f);
+    l->a = 0.0f;
+    l->b = 0.0f;
+    l->c = 1.0f;
+    esc->llums->addLlum(l);
+
+    Llum *l2 = new Llum("llum_direccional");
+    l2->dir = vec4(50,50,0,0);
+    l2->diffuse = vec3(0.9f);
+    l2->ambient = vec3(0.0f);
+    l2->specular = vec3(0.9f);
+    l2->a = 0.0f;
+    l2->b = 0.0f;
+    l2->c = 1.0f;
+    esc->llums->addLlum(l2);
+
+    Llum *l3 = new Llum("llum_spot");
+    l3->position = vec4(0,25,0,0);
+    l3->dir = vec4(0,1,0,0);
+    l3->angle = 0.85f;
+    l3->diffuse = vec3(0.9f);
+    l3->ambient = vec3(0.0f);
+    l3->specular = vec3(0.9f);
+    l3->a = 0.0f;
+    l3->b = 0.0f;
+    l3->c = 1.0f;
+    esc->llums->addLlum(l3);
+
 
 }
 
@@ -93,8 +147,7 @@ static void qNormalizeAngle(int &angle) {
 }
 
 void GLWidget::newObjecte(Objecte * obj) {
-    obj->make();
-    obj->toGPU(program);
+
     if(dynamic_cast<Terra*>(obj)) {
         esc->addLand((Terra*)obj);
     }else{
@@ -103,7 +156,6 @@ void GLWidget::newObjecte(Objecte * obj) {
     obj->backupPoints();
 
     esc->resetCameraPanoramica();
-    esc->camera->update();
     if(esc->camera->name == "Tercera")
         esc->actualitzaCameraThirdPerson();
 
@@ -119,8 +171,8 @@ void GLWidget::newObstacle(int nombre) {
 
     if(esc->terra == NULL || esc->myCar == NULL) {
         //mostrar un dialog d'error
-       QMessageBox::information(0, "Avis", "Has de crear abans el terra i el cotxe");
-       return;
+       //QMessageBox::information(0, "Avis", "Has de crear abans el terra i el cotxe");
+       //return;
     }
 
     Capsa3D capsa = esc->CapsaMinCont3DEscena();
@@ -143,10 +195,14 @@ void GLWidget::newObstacle(int nombre) {
         }else {
             delete o;
             o = new Obstacle(x,0,z,t*0.1f);
+            o->make();
+            o->toGPU(programs[1]);
             newObjecte(o);
         }
         i++;
     }
+
+
 }
 
 void GLWidget::newTerra(float amplaria, float profunditat, float y) {
@@ -156,8 +212,15 @@ void GLWidget::newTerra(float amplaria, float profunditat, float y) {
     // Metode a implementar
     Terra *t;
 
+
+    esc->llums->llums[0]->position = vec4(-max(amplaria, profunditat),max(amplaria, profunditat), 0,1);
+    esc->llums->llums[2]->position = vec4(0,max(amplaria/2.0f, profunditat/2.0f), 0,1);
     t = new Terra(amplaria, profunditat, y);
+    t->make();
+    t->toGPU(programs[2]);
     newObjecte(t);
+
+
 
  }
 
@@ -167,7 +230,7 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
     // Cal modificar-lo per a que es posicioni a la Y correcte
     float yorig = 0;
 
-    if(mida<10) mida = 10;
+    if(mida<20) mida = 20;
 
     ReadObject *r = new ReadObject();
     //r.readObj(obj, &cares, &vertexs);
@@ -175,7 +238,8 @@ void GLWidget::newCotxe(QString fichero, float xorig, float zorig, float mida, f
 
 
     //obj = new Cotxe(vertexs, cares,mida, xorig, yorig, zorig, 0., 0., 0.,xdirec, ydirec, zdirec);
-
+    obj->make();
+    obj->toGPU(programs[0]);
     newObjecte(obj);
     //esc->actualitzaCameraThirdPerson();
     updateGL();
@@ -301,7 +365,6 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             //esc->camera->setVRP(esc->myCar->calculCapsa3D());
             //esc->camera->update();
             esc->actualitzaCameraThirdPerson();
-            updateGL();
             break;
         case Qt::Key_Down:
             if(!esc->isCollision(esc->myCar)){
@@ -312,20 +375,17 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             //esc->camera->setVRP(esc->myCar->calculCapsa3D());
             //esc->camera->update();
             esc->actualitzaCameraThirdPerson();
-            updateGL();
             break;
         case Qt::Key_Left:
             esc->myCar->turnleft();
-            updateGL();
             break;
         case Qt::Key_Right:
             esc->myCar->turnright();
-            updateGL();
             break;
         case Qt::Key_Escape:
             if(esc->myCar == NULL) return;
             if (!esc->cameras.contains("Tercera")) {
-                Camera *c = new Camera("Tercera", program, this->size().width(), this->height());
+                Camera *c = new Camera("Tercera", this->size().width(), this->height());
                 esc->addCamera(c);
                 esc->iniLookAtCotxe();
             }
@@ -338,9 +398,17 @@ void GLWidget::keyPressEvent(QKeyEvent *event) {
             esc->applyCamera(name);
             if(name == "Tercera")
                 esc->actualitzaCameraThirdPerson();
-            updateGL();
             break;
     }
+
+    if (event->key()==Qt::Key_1){
+        esc->llums->llums[0]->on = esc->llums->llums[0]->on == 0 ? 1:0;
+    } else if(event->key()==Qt::Key_2) {
+        esc->llums->llums[1]->on = esc->llums->llums[1]->on == 0 ? 1:0;
+    } else if(event->key()==Qt::Key_3) {
+        esc->llums->llums[2]->on = esc->llums->llums[2]->on == 0 ? 1:0;
+    }
+    updateGL();
 }
 void GLWidget::keyReleaseEvent(QKeyEvent *event)
 {

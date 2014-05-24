@@ -31,7 +31,6 @@ void escena::addCamera(Camera *c) {
 void escena::applyCamera(QString name) {
     if (cameras.contains(name)) {
         this->camera = cameras.value(name);
-        this->camera->update();
     }
     //Si no, se queda la camara que ya había.
 }
@@ -41,7 +40,6 @@ void escena::actualitzaCameraPanoramica(bool clip) {
         camera->CalculWindowAmbRetallat();
     }
     camera->CalculaMatriuProjection();
-    camera->update();
 }
 
 void escena::resetCameraPanoramica() {
@@ -66,8 +64,6 @@ void escena::actualitzaCameraThirdPerson() {
     camera->vs.angy = myCar->rotateCotxe+90;
     camera->setVRP(capsa);
     camera->setOBS(capsa);
-    camera->update();
-
 }
 
 void escena::iniLookAtCotxe() {
@@ -75,10 +71,10 @@ void escena::iniLookAtCotxe() {
     /*set params of camera*/
     Capsa3D capsa = myCar->calculCapsa3D();
     c->piram.proj = PERSPECTIVA;
-    c->piram.d = capsa.max_size;
-    c->piram.dant = capsa.max_size*0.4f;
+    c->piram.d = capsa.max_size*0.6f;
+    c->piram.dant = capsa.max_size*0.2f;
     c->piram.dpost = c->piram.d+capsa.max_size/2.0;//piram.dant+capsa.max_size;
-    c->vs.angx = -40;
+    c->vs.angx = -20;
     c->vs.angy = myCar->rotateCotxe+90;
     c->setVRP(capsa);
     c->setOBS(capsa);
@@ -166,15 +162,21 @@ void escena::aplicaTGCentrat(mat4 m) {
 
 void escena::draw() {
     for(unsigned int i=0; i<vObjectes.size(); i++) {
+        vObjectes[i]->program->bind();
+        camera->toGPU(vObjectes[i]->program);
+        llums->toGPU(vObjectes[i]->program);
         vObjectes[i]->draw();
     }
-    if(terra!=NULL)
+    if(terra!=NULL){
+        terra->program->bind();
+        camera->toGPU(terra->program);
+        llums->toGPU(terra->program);
         terra->draw();
+    }
 }
 
 void escena::reset() {
     resetCameraPanoramica();
-    camera->update();
     for(unsigned int i=0; i<vObjectes.size(); i++) {
         vObjectes[i]->make();
     }

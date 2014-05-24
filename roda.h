@@ -9,7 +9,7 @@ enum WheelType { ESQUERRA_POSTERIOR, DRETA_POSTERIOR, ESQUERRA_DAVANTERA, DRETA_
 class Roda : public Objecte {
     public:
 
-        Roda(vector<point4>, vector<Cara>);
+        Roda(vector<point4>, vector<Cara*>);
 
         WheelType type;
 };

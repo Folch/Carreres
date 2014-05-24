@@ -8,6 +8,7 @@
 #include <Common.h>
 #include <cara.h>
 #include <limits>
+#include "material.h"
 
 #include <QGLShaderProgram>
 
@@ -26,35 +27,40 @@ protected:
     float yRot;
     float zRot;
 
-    GLenum mode;
-
     GLfloat tam; // Escala de l'objecte plicada al fitxer d'entrada
 
     // Programa de shaders de la GPU
-    QGLShaderProgram *program;
+
     GLuint buffer; // Buffer de comunicacio amb la GPU
 
     // Estructures de vertexs i colors per passar a la GPU
     int     numPoints;
     point4 *points;
     point4 *pointsTmp;
-    color4 *colors;
+    point4 *normals;
+    //color4 *colors;
     int Index; // index de control del numero de vertexs a posar a la GPU
 
 
 public:
 
     GLfloat xorig, yorig, zorig;
-    vector<Cara> cares; // cares de l'objecte
+    vector<Cara*> cares; // cares de l'objecte
     vector<point4> vertexs; // vertexs de l'objecte sense repetits
+    QHash<int, vector<Cara*> > caresHash;
+    QGLShaderProgram *program;
+
+    Material *m;
 
     float getYOrig();
     // Capsa mínima contenidora de l'objecte
     Capsa3D capsa;
 
+    GLenum mode;
+
     //explicit Objecte(QObject *parent = 0);
-    Objecte(vector<point4> vertexsz, vector<Cara>,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
-    Objecte(vector<point4> vertexs, vector<Cara>);
+    Objecte(vector<point4> vertexsz, vector<Cara*>,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
+    Objecte(vector<point4> vertexs, vector<Cara*>);
 
     Objecte(const int npoints);
     Objecte(const int npoints,GLfloat, GLfloat,GLfloat,GLfloat,double, double, double);
@@ -86,7 +92,11 @@ public:
 
 private:
     void construeix_cara ( char **words, int nwords);
-
+    void bindCares();
+    void recalculaNormals();
+    void normalsFlatShading();
+    vec4 getNormalFlatShading(vector<Cara*> cares);
+    vec4 getNormalGourond(vector<Cara*> cares);
 };
 
 
