@@ -1,4 +1,4 @@
-graficsPrac1
+Carreres
 ============
 
-Pràctica 1 de la asignatura de gràfics
+Conjunt acomulatiu de pràctiques de gràfics i visualització de dades (UB)
