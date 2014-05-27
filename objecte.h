@@ -1,6 +1,9 @@
 #ifndef OBJECTE_H
 #define OBJECTE_H
 
+#define FLAT 0
+#define GOURAUD 1
+
 #include <QObject>
 
 #include <vector>
@@ -28,6 +31,8 @@ protected:
     float zRot;
 
     GLfloat tam; // Escala de l'objecte plicada al fitxer d'entrada
+
+    short tipusNormal;
 
     // Programa de shaders de la GPU
 
@@ -93,8 +98,10 @@ public:
 private:
     void construeix_cara ( char **words, int nwords);
     void bindCares();
-    void recalculaNormals();
+    void calculaNormals();
     void normalsFlatShading();
+    void aplicaTGNormals(mat4 m);
+
     vec4 getNormalFlatShading(vector<Cara*> cares);
     vec4 getNormalGourond(vector<Cara*> cares);
 };

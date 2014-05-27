@@ -66,15 +66,15 @@ vec4 getColor(tipusLlum light, tipusMaterial mat, vec4 v, vec4 dir) {
 
 
 vec4 getSpotColor(tipusLlum light, tipusMaterial mat, vec4 v, vec4 dir) {
-    float fCosine = dot(light.dir, normalize(dir));
+    float angle = dot(light.dir, normalize(dir));
 
-    if(fCosine > light.angle)
+    if(angle > light.angle)
         return getColor(light, mat, v, dir);
 
     vec4 Ia = vec4(light.ambient,1.0f);
     vec4 ka = vec4(mat.ambient,1.0f);
 
-    return Ia*ka;
+    return light.on ==1 ? Ia*ka : vec4(0.0f);
 }
 
 void main() {

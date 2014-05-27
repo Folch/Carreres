@@ -54,6 +54,8 @@ void Objecte::init(GLfloat mida, GLfloat xorig,GLfloat yorig,GLfloat zorig,doubl
     this->capsa.a = 0;
     this->capsa.h = 0;
     this->capsa.p = 0;
+
+    tipusNormal = GOURAUD;
 }
 
 
@@ -65,13 +67,7 @@ Objecte::~Objecte()
         delete normals;
 }
 
-/*
- *  typedef struct {
-          vec3 pmin;
-          GLfloat a, h, p;
-    } Capsa3D;
 
- */
 Capsa3D Objecte::calculCapsa3D() {
     // Metode a implementar: calcula la capsa mínima contenidora d'un objecte
 
@@ -126,8 +122,10 @@ void Objecte::aplicaTG(mat4 m)
 }
 
 
-void Objecte::aplicaTGPoints(mat4 m)
-{
+void Objecte::aplicaTGPoints(mat4 m) {
+
+    aplicaTGNormals(m);
+
     point4 *transformed_points = new point4[Index];
 
     for ( int i = 0; i < Index; i++) {
@@ -143,6 +141,13 @@ void Objecte::aplicaTGPoints(mat4 m)
     }
 
     delete transformed_points;
+}
+
+
+void Objecte::aplicaTGNormals(mat4 m) {
+    for (int i = 0; i < numPoints; ++i) {
+        normals[i] = normalize(m * normals[i]);
+    }
 }
 
 void Objecte::backupPoints() {
@@ -208,7 +213,7 @@ void Objecte::draw() {
 
 void Objecte::make() {
     bindCares();
-    recalculaNormals();
+    calculaNormals();
     Index = 0;
     vec4 vector;
     int idx;
@@ -217,7 +222,10 @@ void Objecte::make() {
             idx = cares[i]->idxVertices[j];
             points[Index] = vertexs[idx];
             pointsTmp[Index] = vertexs[idx];
-            vector = getNormalGourond(caresHash[idx]);
+            if(tipusNormal == GOURAUD)
+                vector = getNormalGourond(caresHash[idx]);
+            else if(tipusNormal == FLAT)
+                vector = getNormalFlatShading(caresHash[idx]);
             normals[Index].x = vector.x;
             normals[Index].y = vector.y;
             normals[Index].z = vector.z;
@@ -227,7 +235,7 @@ void Objecte::make() {
     //normalsFlatShading();
 }
 
-void Objecte::recalculaNormals() {
+void Objecte::calculaNormals() {
     for (int i = 0; i < cares.size(); i++) {
         cares[i]->calculaNormal(vertexs);
     }
@@ -244,7 +252,7 @@ void Objecte::bindCares() {
 
 /*Aquí tinc una llista de cares, i he de retornar la normal d'una d'elles*/
 vec4 Objecte::getNormalFlatShading(vector<Cara*> cares) {
-    return cares[0]->normal;
+        return cares[0]->normal;
 }
 
 /*Aquí tinc una llista de cares, i he de retornar la normal d'una d'elles*/

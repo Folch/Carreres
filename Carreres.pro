@@ -64,7 +64,5 @@ FORMS    += mainwindow.ui \
 OTHER_FILES += \
     vshadercotxe.glsl \
     fshadercotxe.glsl \
-    vshaderobstacle.glsl \
-    fshaderobstacle.glsl \
-    vshaderterra.glsl \
-    fshaderterra.glsl
+    vshadergeneral.glsl \
+    fshadergeneral.glsl

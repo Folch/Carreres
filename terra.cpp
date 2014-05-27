@@ -19,7 +19,7 @@ void Terra::init(float x, float y, float z) {
     vertexs.push_back(point4(xorig+(x/2.0f), y, zorig+(z/2.0f), 1.0f)); //4
     */
 
-
+    tipusNormal = FLAT;
 
     this->mode = GL_TRIANGLES;
 

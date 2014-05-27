@@ -40,60 +40,25 @@ uniform tipusMaterial material;
 uniform vec3 Ia_global;
 uniform vec3 ka_global;
 
-OUT vec4 color;
 
-vec4 getColor(tipusLlum light, tipusMaterial mat, vec4 v, vec4 dir) {
-    if(light.on == 0) return vec4(0.0f);
+OUT mat4 view;
+OUT vec4 n;
+OUT vec4 position;
 
-    float d = length(dir);
-    vec4 l = normalize(dir);
-    vec4 h = (l+v) / length(l+v);
-    vec4 n = normalize(vNormal);
-
-    vec4 ks = vec4(mat.specular,0);
-    vec4 kd = vec4(mat.diffuse,0);
-    vec4 ka = vec4(mat.ambient,0);
-
-    vec4 Ia = vec4(light.ambient,1.0f);
-    vec4 Is = vec4(light.specular,1.0f);
-    vec4 Id = vec4(light.diffuse,1.0f);
-
-    return (1.0f/(light.a*d*d+light.b*d+light.c))*
-                      ((kd*Id) * max(dot(l, n),0) +
-                      (ks*Is) * max(pow((dot(n,h)), mat.shineness),0) +
-                       ka*Ia);
-}
+OUT vec4 iag;
+OUT vec4 kag;
 
 
-vec4 getSpotColor(tipusLlum light, tipusMaterial mat, vec4 v, vec4 dir) {
-    float a = dot(light.dir, normalize(dir));
-
-    if(a > light.angle)
-        return getColor(light, mat, v, dir);
-
-    vec4 Ia = vec4(light.ambient,1.0f);
-    vec4 ka = vec4(mat.ambient,1.0f);
-
-    return vec4(0.0f);
-}
-
-void main() {
+void main(){
     gl_Position = projection*model_view*vPosition;
 
-    vec4 v = normalize(model_view*vPosition);
-    vec4 dir_puntual = llum_puntual.posicio-vPosition;
-    vec4 dir_directional = llum_direccional.dir;
-    vec4 dir_spot = llum_spot.posicio-vPosition;
+    n = normalize(vNormal);
+    view = model_view;
+    position = vPosition;
 
-    vec4 iag = vec4(Ia_global, 1.0f);
-    vec4 kag = vec4(ka_global, 1.0f);
-
-    color = iag * kag +
-          (getColor(llum_puntual, material, v, dir_puntual) +
-           getColor(llum_direccional, material, v, dir_directional) +
-           getSpotColor(llum_spot, material, v, dir_spot));
+    iag = vec4(Ia_global, 1.0f);
+    kag = vec4(ka_global, 1.0f);
 }
-
 
 
 

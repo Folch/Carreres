@@ -17,7 +17,9 @@ public:
     vec3 Ia;
 
     void addLlum(Llum*);
+    void setAmbientToGPU(QGLShaderProgram*);
     void toGPU(QGLShaderProgram*);
+
 };
 
 #endif // CONJUNTLLUMS_H

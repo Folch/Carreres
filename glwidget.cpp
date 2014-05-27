@@ -69,8 +69,7 @@ void GLWidget::initShadersGPU() {
 
     //programs:
         // 0: programCotxe
-        // 1: programObstacle
-        // 2: programTerra
+        // 1: program
 
     //Carrega dels shaders i posa a punt per utilitzar els programes carregats a la GPU
     QGLShaderProgram* programCotxe = new QGLShaderProgram(this);
@@ -78,23 +77,18 @@ void GLWidget::initShadersGPU() {
     programs.push_back(programCotxe);
 
 
-    QGLShaderProgram* programObstacle = new QGLShaderProgram(this);
-    InitShader( "../Carreres/vshaderobstacle.glsl", "../Carreres/fshaderobstacle.glsl", programObstacle);
-    programs.push_back(programObstacle);
-
-
-    QGLShaderProgram* programTerra = new QGLShaderProgram(this);
-    InitShader( "../Carreres/vshaderterra.glsl", "../Carreres/fshaderterra.glsl", programTerra);
-    programs.push_back(programTerra);
+    QGLShaderProgram* program = new QGLShaderProgram(this);
+    InitShader( "../Carreres/vshadergeneral.glsl", "../Carreres/fshadergeneral.glsl", program);
+    programs.push_back(program);
 
     esc = new escena(new Camera("Paralela", this->size().width(), this->size().height()));
 
     esc->llums = new ConjuntLlums();
-    esc->llums->Ia = vec3(0.1f);
-    esc->llums->ka = vec3(0.1f);
+    esc->llums->Ia = vec3(0.2f);
+    esc->llums->ka = vec3(0.2f);
 
     Llum *l = new Llum("llum_puntual");
-    l->position = vec4(-50,50,0,0);
+    l->position = vec4(0,0,-50,0);
     l->diffuse = vec3(0.9f);
     l->ambient = vec3(0.0f);
     l->specular = vec3(0.9f);
@@ -104,7 +98,7 @@ void GLWidget::initShadersGPU() {
     esc->llums->addLlum(l);
 
     Llum *l2 = new Llum("llum_direccional");
-    l2->dir = vec4(50,50,0,0);
+    l2->dir = vec4(0,0,50,0);
     l2->diffuse = vec3(0.9f);
     l2->ambient = vec3(0.0f);
     l2->specular = vec3(0.9f);
@@ -116,10 +110,10 @@ void GLWidget::initShadersGPU() {
     Llum *l3 = new Llum("llum_spot");
     l3->position = vec4(0,25,0,0);
     l3->dir = vec4(0,1,0,0);
-    l3->angle = 0.85f;
-    l3->diffuse = vec3(0.9f);
+    l3->angle = 0.57f;
+    l3->diffuse = vec3(1.0f);
     l3->ambient = vec3(0.0f);
-    l3->specular = vec3(0.9f);
+    l3->specular = vec3(1.0f);
     l3->a = 0.0f;
     l3->b = 0.0f;
     l3->c = 1.0f;
@@ -213,11 +207,11 @@ void GLWidget::newTerra(float amplaria, float profunditat, float y) {
     Terra *t;
 
 
-    esc->llums->llums[0]->position = vec4(-max(amplaria, profunditat),max(amplaria, profunditat), 0,1);
+    esc->llums->llums[0]->position = vec4(0,0,-max(amplaria, profunditat),1);
     esc->llums->llums[2]->position = vec4(0,max(amplaria/2.0f, profunditat/2.0f), 0,1);
     t = new Terra(amplaria, profunditat, y);
     t->make();
-    t->toGPU(programs[2]);
+    t->toGPU(programs[1]);
     newObjecte(t);
 
 
