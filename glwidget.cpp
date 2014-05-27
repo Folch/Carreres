@@ -78,6 +78,7 @@ void GLWidget::initShadersGPU() {
 
 
     QGLShaderProgram* program = new QGLShaderProgram(this);
+    //InitShader( "../Carreres/vshadercotxe.glsl", "../Carreres/fshadercotxe.glsl", program);
     InitShader( "../Carreres/vshadergeneral.glsl", "../Carreres/fshadergeneral.glsl", program);
     programs.push_back(program);
 
