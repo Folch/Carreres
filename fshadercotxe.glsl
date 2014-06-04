@@ -28,12 +28,13 @@ struct tipusMaterial {
     float shineness;
 };
 
-IN mat4 view;
 IN vec4 n;
 IN vec4 position;
 
 IN vec4 iag;
 IN vec4 kag;
+
+uniform mat4 model_view;
 
 uniform tipusLlum llum_puntual;
 uniform tipusLlum llum_direccional;
@@ -78,8 +79,7 @@ vec4 getSpotColor(tipusLlum light, tipusMaterial mat, vec4 v, vec4 dir) {
 
 void main() {
 
-    vec4 pos = vec4(gl_FragCoord.xyz,1.0f);
-    vec4 v = normalize(view*pos);
+    vec4 v = normalize(model_view*position);
     vec4 dir_puntual = llum_puntual.posicio-position;
     vec4 dir_directional = llum_direccional.dir;
     vec4 dir_spot = llum_spot.posicio-position;
