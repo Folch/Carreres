@@ -10,16 +10,16 @@
 #define UI_MAINWINDOW_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QHeaderView>
-#include <QtGui/QMainWindow>
-#include <QtGui/QMenu>
-#include <QtGui/QMenuBar>
-#include <QtGui/QStatusBar>
-#include <QtGui/QToolBar>
-#include <QtGui/QWidget>
+#include <QAction>
+#include <QApplication>
+#include <QButtonGroup>
+#include <QHeaderView>
+#include <QMainWindow>
+#include <QMenu>
+#include <QMenuBar>
+#include <QStatusBar>
+#include <QToolBar>
+#include <QWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -96,23 +96,23 @@ public:
 
     void retranslateUi(QMainWindow *MainWindow)
     {
-        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0, QApplication::UnicodeUTF8));
-        actionNew_Obstacle->setText(QApplication::translate("MainWindow", "New Obstacle", 0, QApplication::UnicodeUTF8));
+        MainWindow->setWindowTitle(QApplication::translate("MainWindow", "MainWindow", 0));
+        actionNew_Obstacle->setText(QApplication::translate("MainWindow", "New Obstacle", 0));
 #ifndef QT_NO_TOOLTIP
-        actionNew_Obstacle->setToolTip(QApplication::translate("MainWindow", "<html><head/><body><p>Add a new obstacle to the scene</p></body></html>", 0, QApplication::UnicodeUTF8));
+        actionNew_Obstacle->setToolTip(QApplication::translate("MainWindow", "<html><head/><body><p>Add a new obstacle to the scene</p></body></html>", 0));
 #endif // QT_NO_TOOLTIP
-        actionNew_Cotxe->setText(QApplication::translate("MainWindow", "New Cotxe", 0, QApplication::UnicodeUTF8));
+        actionNew_Cotxe->setText(QApplication::translate("MainWindow", "New Cotxe", 0));
 #ifndef QT_NO_TOOLTIP
-        actionNew_Cotxe->setToolTip(QApplication::translate("MainWindow", "New Cotxe", 0, QApplication::UnicodeUTF8));
+        actionNew_Cotxe->setToolTip(QApplication::translate("MainWindow", "New Cotxe", 0));
 #endif // QT_NO_TOOLTIP
-        actionStart->setText(QApplication::translate("MainWindow", "Start", 0, QApplication::UnicodeUTF8));
-        actionStop->setText(QApplication::translate("MainWindow", "Stop", 0, QApplication::UnicodeUTF8));
-        actionReset->setText(QApplication::translate("MainWindow", "Reset", 0, QApplication::UnicodeUTF8));
-        actionNew_Terra->setText(QApplication::translate("MainWindow", "New Terra", 0, QApplication::UnicodeUTF8));
-        actionExit->setText(QApplication::translate("MainWindow", "Exit", 0, QApplication::UnicodeUTF8));
-        menuFile->setTitle(QApplication::translate("MainWindow", "File", 0, QApplication::UnicodeUTF8));
-        menuView->setTitle(QApplication::translate("MainWindow", "View", 0, QApplication::UnicodeUTF8));
-        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0, QApplication::UnicodeUTF8));
+        actionStart->setText(QApplication::translate("MainWindow", "Start", 0));
+        actionStop->setText(QApplication::translate("MainWindow", "Stop", 0));
+        actionReset->setText(QApplication::translate("MainWindow", "Reset", 0));
+        actionNew_Terra->setText(QApplication::translate("MainWindow", "New Terra", 0));
+        actionExit->setText(QApplication::translate("MainWindow", "Exit", 0));
+        menuFile->setTitle(QApplication::translate("MainWindow", "File", 0));
+        menuView->setTitle(QApplication::translate("MainWindow", "View", 0));
+        toolBar->setWindowTitle(QApplication::translate("MainWindow", "toolBar", 0));
     } // retranslateUi
 
 };

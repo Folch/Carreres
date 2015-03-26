@@ -10,14 +10,14 @@
 #define UI_NEWOBSTACLEDIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPlainTextEdit>
+#include <QAction>
+#include <QApplication>
+#include <QButtonGroup>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHeaderView>
+#include <QLabel>
+#include <QPlainTextEdit>
 
 QT_BEGIN_NAMESPACE
 
@@ -59,8 +59,8 @@ public:
 
     void retranslateUi(QDialog *NewObstacleDialog)
     {
-        NewObstacleDialog->setWindowTitle(QApplication::translate("NewObstacleDialog", "Dialog", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("NewObstacleDialog", "NOMBRE", 0, QApplication::UnicodeUTF8));
+        NewObstacleDialog->setWindowTitle(QApplication::translate("NewObstacleDialog", "Dialog", 0));
+        label->setText(QApplication::translate("NewObstacleDialog", "NOMBRE", 0));
     } // retranslateUi
 
 };

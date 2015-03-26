@@ -10,14 +10,14 @@
 #define UI_NEWTERRADIALOG_H
 
 #include <QtCore/QVariant>
-#include <QtGui/QAction>
-#include <QtGui/QApplication>
-#include <QtGui/QButtonGroup>
-#include <QtGui/QDialog>
-#include <QtGui/QDialogButtonBox>
-#include <QtGui/QHeaderView>
-#include <QtGui/QLabel>
-#include <QtGui/QPlainTextEdit>
+#include <QAction>
+#include <QApplication>
+#include <QButtonGroup>
+#include <QDialog>
+#include <QDialogButtonBox>
+#include <QHeaderView>
+#include <QLabel>
+#include <QPlainTextEdit>
 
 QT_BEGIN_NAMESPACE
 
@@ -90,10 +90,10 @@ public:
 
     void retranslateUi(QDialog *NewTerraDialog)
     {
-        NewTerraDialog->setWindowTitle(QApplication::translate("NewTerraDialog", "Dialog", 0, QApplication::UnicodeUTF8));
-        label->setText(QApplication::translate("NewTerraDialog", "AMPL\303\200RIA", 0, QApplication::UnicodeUTF8));
-        label_2->setText(QApplication::translate("NewTerraDialog", "PROFUNDITAT", 0, QApplication::UnicodeUTF8));
-        label_3->setText(QApplication::translate("NewTerraDialog", "Y", 0, QApplication::UnicodeUTF8));
+        NewTerraDialog->setWindowTitle(QApplication::translate("NewTerraDialog", "Dialog", 0));
+        label->setText(QApplication::translate("NewTerraDialog", "AMPL\303\200RIA", 0));
+        label_2->setText(QApplication::translate("NewTerraDialog", "PROFUNDITAT", 0));
+        label_3->setText(QApplication::translate("NewTerraDialog", "Y", 0));
     } // retranslateUi
 
 };
